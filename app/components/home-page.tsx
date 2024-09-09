@@ -98,6 +98,27 @@ export function HomePage() {
     }
   };
 
+  const currentFeedName = selectedFeedId
+    ? feeds.find((feed) => feed.id === selectedFeedId)?.name || "Unknown Feed"
+    : "All Feeds";
+
+  const filterButtons = (
+    <>
+      {["All Feeds", "Unread", "Starred"].map((filter) => (
+        <Button
+          key={filter}
+          variant={activeFilter === filter ? "default" : "outline"}
+          onClick={() => {
+            setActiveFilter(filter);
+            setSelectedFeedId(null);
+          }}
+        >
+          {filter}
+        </Button>
+      ))}
+    </>
+  );
+
   const displayedArticles = selectedFeedId ? articles : articles;
 
   return (
@@ -117,21 +138,7 @@ export function HomePage() {
         setFeeds={setFeeds} // Add this line
       />
       <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
-        <Header />
-        <div className="flex space-x-2 p-4 border-b">
-          {["All Feeds", "Unread", "Starred"].map((filter) => (
-            <Button
-              key={filter}
-              variant={activeFilter === filter ? "default" : "outline"}
-              onClick={() => {
-                setActiveFilter(filter);
-                setSelectedFeedId(null);
-              }}
-            >
-              {filter}
-            </Button>
-          ))}
-        </div>
+        <Header feedName={currentFeedName} filterButtons={filterButtons} />
         <ArticleList
           articles={displayedArticles}
           isLoading={isLoading}

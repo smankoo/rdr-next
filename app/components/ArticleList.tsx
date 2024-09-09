@@ -2,22 +2,15 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { timeAgo } from "@/app/lib/utils";
 import ArticleModal from "./ArticleModal";
-
-interface Article {
-  id: string;
-  title: string;
-  description: string;
-  pubDate: string;
-  author?: string;
-  imageUrl?: string;
-  link: string;
-}
+import { Article, Feed } from "@/app/types";
 
 interface ArticleListProps {
   articles: Article[];
+  isLoading: boolean;
+  feeds: Feed[];
 }
 
-const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
+const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds }) => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
   return (
@@ -62,7 +55,15 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
           ))}
         </div>
       </div>
-      {selectedArticle && <ArticleModal article={selectedArticle} onClose={() => setSelectedArticle(null)} />}
+      {selectedArticle && (
+        <ArticleModal
+          article={{
+            ...selectedArticle,
+            description: selectedArticle.description || "",
+          }}
+          onClose={() => setSelectedArticle(null)}
+        />
+      )}
     </div>
   );
 };

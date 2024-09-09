@@ -12,7 +12,13 @@ export async function GET(request: Request) {
     if (feedId) {
       const feed = await prisma.feed.findUnique({
         where: { id: feedId },
-        include: { articles: true },
+        include: {
+          articles: {
+            orderBy: {
+              pubDate: "desc",
+            },
+          },
+        },
       });
 
       if (!feed) {
@@ -32,13 +38,20 @@ export async function GET(request: Request) {
         // Fetch the newly created articles
         articles = await prisma.article.findMany({
           where: { feedId: feed.id },
+          orderBy: {
+            pubDate: "desc",
+          },
         });
       } else {
         articles = feed.articles;
       }
     } else {
       // If no feedId is provided, fetch all articles
-      articles = await prisma.article.findMany();
+      articles = await prisma.article.findMany({
+        orderBy: {
+          pubDate: "desc",
+        },
+      });
     }
 
     return NextResponse.json(articles);

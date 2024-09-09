@@ -65,6 +65,9 @@ export async function fetchFeed(url: string): Promise<FeedItem[]> {
             };
           });
 
+          // Sort feedItems by pubDate in descending order
+          feedItems.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+
           resolve(feedItems);
 
           // Emit SSE event after successful fetch

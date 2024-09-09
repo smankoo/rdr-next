@@ -7,6 +7,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { url } = req.body;
       const feedItems = await fetchFeedContent(url);
       res.status(200).json(feedItems);
+      console.log("logging from api/fetchFeed.ts");
+      console.log("feedItems", feedItems);
     } catch (error) {
       res.status(500).json({ error: "Error fetching feed" });
     }

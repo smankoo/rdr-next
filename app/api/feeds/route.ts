@@ -1,36 +1,36 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import Parser from "rss-parser";
+import { fetchFeed } from "@/app/lib/rssFetcher";
 
 const prisma = new PrismaClient();
-const parser = new Parser();
 
 export async function POST(request: Request) {
   const { url, name } = await request.json();
 
   try {
-    const parsedFeed = await parser.parseURL(url);
-    const feedName = name || parsedFeed.title || "Unnamed Feed";
+    const { title: feedTitle, items: feedItems } = await fetchFeed(url);
+    const feedName = name || feedTitle || "Unnamed Feed";
 
     const feed = await prisma.feed.create({
       data: { url, name: feedName },
     });
 
-    for (const item of parsedFeed.items) {
+    for (const item of feedItems) {
       await prisma.article.create({
         data: {
           title: item.title || "",
           link: item.link || "",
-          description: item.contentSnippet || "",
-          pubDate: item.isoDate ? new Date(item.isoDate) : new Date(),
+          description: item.content || "",
+          pubDate: new Date(item.pubDate),
           feedId: feed.id,
-          imageUrl: item.enclosure?.url || item["media:content"]?.$.url || "",
+          imageUrl: item.imageUrl || "",
         },
       });
     }
 
     return NextResponse.json(feed);
   } catch (error) {
+    console.error("Error adding feed:", error);
     return NextResponse.json({ error: "Failed to add feed" }, { status: 500 });
   }
 }

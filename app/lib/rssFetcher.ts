@@ -123,8 +123,6 @@ function parseAtom(feed: any): FeedItem[] {
       if (descriptionMatch) {
         // Remove HTML tags and trim
         description = descriptionMatch[1].replace(/<[^>]*>/g, "").trim();
-        // Limit description to first 500 characters
-        description = description.substring(0, 500) + (description.length > 500 ? "..." : "");
       }
     }
 

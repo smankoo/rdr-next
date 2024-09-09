@@ -1,5 +1,5 @@
-import React from "react";
-import { Plus, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
+import { Plus, ChevronRight, Settings, X } from "lucide-react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger } from "@/app/components/ui/collapsible";
@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/app/components/ui/input";
 import { Feed } from "@/app/types";
 import { useResizable } from "@/app/hooks/useResizable";
-import { useState } from "react";
 
 interface SidebarProps {
   feeds: Feed[];
@@ -22,6 +21,7 @@ interface SidebarProps {
   isAddFeedOpen: boolean;
   setIsAddFeedOpen: (isOpen: boolean) => void;
   setFeeds: React.Dispatch<React.SetStateAction<Feed[]>>; // Add this line
+  updateFeed: (id: string, url: string, name: string) => Promise<void>; // Add this line
 }
 
 export function Sidebar({
@@ -37,10 +37,36 @@ export function Sidebar({
   isAddFeedOpen,
   setIsAddFeedOpen,
   setFeeds, // Add this line
+  updateFeed, // Add this line
 }: SidebarProps) {
   const { width, startResizing } = useResizable(256, 200, 400);
+  const [hoveredFeedId, setHoveredFeedId] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [editingFeed, setEditingFeed] = useState<Feed | null>(null);
+  const [editingFeedUrl, setEditingFeedUrl] = useState("");
+  const [editingFeedName, setEditingFeedName] = useState("");
 
-  // Remove the handleAddFeed function, as we'll use the prop directly
+  const handleOpenSettings = (feed: Feed) => {
+    setEditingFeed(feed);
+    setEditingFeedUrl(feed.url);
+    setEditingFeedName(feed.name);
+    setIsSettingsOpen(true);
+  };
+
+  const handleUpdateFeed = () => {
+    if (editingFeed) {
+      updateFeed(editingFeed.id, editingFeedUrl, editingFeedName);
+      setIsSettingsOpen(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleUpdateFeed();
+    } else if (e.key === "Escape") {
+      setIsSettingsOpen(false);
+    }
+  };
 
   return (
     <aside className="p-4 hidden md:block relative" style={{ width: `${width}px` }}>
@@ -57,37 +83,35 @@ export function Sidebar({
                 selectedFeedId === feed.id ? "bg-accent" : ""
               }`}
               onClick={() => setSelectedFeedId(feed.id)}
+              onMouseEnter={() => setHoveredFeedId(feed.id)}
+              onMouseLeave={() => setHoveredFeedId(null)}
             >
               <CollapsibleTrigger asChild>
-                <span className="flex-grow">{feed.name}</span>
+                <span
+                  className={`flex-grow truncate mr-2 ${
+                    selectedFeedId === feed.id ? "font-semibold text-primary" : ""
+                  }`}
+                >
+                  {feed.name}
+                </span>
               </CollapsibleTrigger>
               <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteFeed(feed.id);
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <path d="M3 6h18" />
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                  </svg>
-                </Button>
-                <ChevronRight className="h-4 w-4" />
+                <div className="w-8 h-8 flex items-center justify-center">
+                  {hoveredFeedId === feed.id && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 p-0 text-gray-400 hover:text-gray-700 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenSettings(feed);
+                      }}
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                {/* <ChevronRight className="h-4 w-4 ml-1" /> */}
               </div>
             </div>
           </Collapsible>
@@ -116,6 +140,46 @@ export function Sidebar({
             className="mb-2"
           />
           <Button onClick={() => addFeed(newFeedUrl, newFeedName)}>Add Feed</Button>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Feed Settings</DialogTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSettingsOpen(false)}
+              className="absolute right-4 top-4"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          <Input
+            value={editingFeedUrl}
+            onChange={(e) => setEditingFeedUrl(e.target.value)}
+            placeholder="Feed URL"
+            className="mb-2"
+            onKeyDown={handleKeyDown}
+          />
+          <Input
+            value={editingFeedName}
+            onChange={(e) => setEditingFeedName(e.target.value)}
+            placeholder="Feed Name"
+            className="mb-2"
+            onKeyDown={handleKeyDown}
+          />
+          <div className="flex justify-between">
+            <Button variant="destructive" onClick={() => editingFeed && deleteFeed(editingFeed.id)}>
+              Delete
+            </Button>
+            <div>
+              <Button variant="outline" onClick={() => setIsSettingsOpen(false)} className="mr-2">
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateFeed}>Update</Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </aside>

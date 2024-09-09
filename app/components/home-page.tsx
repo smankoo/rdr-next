@@ -121,6 +121,26 @@ export function HomePage() {
 
   const displayedArticles = selectedFeedId ? articles : articles;
 
+  const updateFeed = async (id: string, url: string, name: string) => {
+    try {
+      const response = await fetch(`/api/feeds/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url, name }),
+      });
+
+      if (response.ok) {
+        setFeeds((prevFeeds) => prevFeeds.map((feed) => (feed.id === id ? { ...feed, url, name } : feed)));
+      } else {
+        console.error("Failed to update feed");
+      }
+    } catch (error) {
+      console.error("Error updating feed:", error);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar
@@ -136,6 +156,7 @@ export function HomePage() {
         isAddFeedOpen={isAddFeedOpen}
         setIsAddFeedOpen={setIsAddFeedOpen}
         setFeeds={setFeeds} // Add this line
+        updateFeed={updateFeed} // Add this line
       />
       <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
         <Header feedName={currentFeedName} filterButtons={filterButtons} />
@@ -150,3 +171,5 @@ export function HomePage() {
 
   console.log("Displayed articles:", displayedArticles);
 }
+
+export default HomePage;

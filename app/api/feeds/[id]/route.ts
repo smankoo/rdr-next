@@ -18,3 +18,20 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "Failed to delete feed" }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+  const { id } = params;
+  const { url, name } = await request.json();
+
+  try {
+    const updatedFeed = await prisma.feed.update({
+      where: { id },
+      data: { url, name },
+    });
+
+    return NextResponse.json(updatedFeed);
+  } catch (error) {
+    console.error("Error updating feed:", error);
+    return NextResponse.json({ error: "Failed to update feed" }, { status: 500 });
+  }
+}

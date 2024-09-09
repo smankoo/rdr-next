@@ -104,7 +104,7 @@ export function HomePage() {
 
   const filterButtons = (
     <>
-      {["All Feeds", "Unread", "Starred"].map((filter) => (
+      {["All Articles", "Unread", "Starred"].map((filter) => (
         <Button
           key={filter}
           variant={activeFilter === filter ? "default" : "outline"}

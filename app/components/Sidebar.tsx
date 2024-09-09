@@ -79,29 +79,25 @@ export function Sidebar({
         {feeds.map((feed) => (
           <Collapsible key={feed.id}>
             <div
-              className={`flex items-center justify-between w-full p-2 hover:bg-accent rounded-md cursor-pointer ${
-                selectedFeedId === feed.id ? "bg-accent" : ""
+              className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors ${
+                selectedFeedId === feed.id ? "bg-gray-100 dark:bg-gray-500" : "hover:bg-gray-100 dark:hover:bg-gray-500"
               }`}
               onClick={() => setSelectedFeedId(feed.id)}
               onMouseEnter={() => setHoveredFeedId(feed.id)}
               onMouseLeave={() => setHoveredFeedId(null)}
             >
               <CollapsibleTrigger asChild>
-                <span
-                  className={`flex-grow truncate mr-2 ${
-                    selectedFeedId === feed.id ? "font-semibold text-primary" : ""
-                  }`}
-                >
+                <span className={`flex-grow truncate mr-2 ${selectedFeedId === feed.id ? "font-semibold" : ""}`}>
                   {feed.name}
                 </span>
               </CollapsibleTrigger>
               <div className="flex items-center">
                 <div className="w-8 h-8 flex items-center justify-center">
-                  {hoveredFeedId === feed.id && (
+                  {(hoveredFeedId === feed.id || selectedFeedId === feed.id) && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 p-0 text-gray-400 hover:text-gray-700 transition-colors"
+                      className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenSettings(feed);
@@ -111,7 +107,6 @@ export function Sidebar({
                     </Button>
                   )}
                 </div>
-                {/* <ChevronRight className="h-4 w-4 ml-1" /> */}
               </div>
             </div>
           </Collapsible>

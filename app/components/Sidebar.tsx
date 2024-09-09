@@ -14,7 +14,7 @@ interface SidebarProps {
   selectedFeedId: string | null;
   setSelectedFeedId: (id: string) => void;
   deleteFeed: (id: string) => void;
-  addFeed: () => void;
+  addFeed: (url: string, name: string) => Promise<void>; // Update this line
   newFeedUrl: string;
   setNewFeedUrl: (url: string) => void;
   newFeedName: string;
@@ -29,7 +29,7 @@ export function Sidebar({
   selectedFeedId,
   setSelectedFeedId,
   deleteFeed,
-  addFeed,
+  addFeed, // Update this line
   newFeedUrl,
   setNewFeedUrl,
   newFeedName,
@@ -40,21 +40,7 @@ export function Sidebar({
 }: SidebarProps) {
   const { width, startResizing } = useResizable(256, 200, 400);
 
-  const handleAddFeed = async (url: string) => {
-    try {
-      const response = await fetch("/api/feeds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-      if (!response.ok) throw new Error("Failed to add feed");
-      const newFeed = await response.json();
-      setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
-      setSelectedFeedId(newFeed.id);
-    } catch (error) {
-      console.error("Error adding feed:", error);
-    }
-  };
+  // Remove the handleAddFeed function, as we'll use the prop directly
 
   return (
     <aside className="p-4 hidden md:block relative" style={{ width: `${width}px` }}>
@@ -129,7 +115,7 @@ export function Sidebar({
             placeholder="Feed Name (optional)"
             className="mb-2"
           />
-          <Button onClick={addFeed}>Add Feed</Button>
+          <Button onClick={() => addFeed(newFeedUrl, newFeedName)}>Add Feed</Button>
         </DialogContent>
       </Dialog>
     </aside>

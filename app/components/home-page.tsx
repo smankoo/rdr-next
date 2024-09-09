@@ -40,12 +40,12 @@ export function HomePage() {
     }
   };
 
-  const addFeed = async () => {
+  const addFeed = async (url: string, name: string) => {
     try {
       const response = await fetch("/api/feeds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: newFeedUrl, name: newFeedName }),
+        body: JSON.stringify({ url, name }),
       });
       if (!response.ok) throw new Error("Failed to add feed");
       const newFeed = await response.json();
@@ -53,6 +53,8 @@ export function HomePage() {
       setNewFeedUrl("");
       setNewFeedName("");
       setIsAddFeedOpen(false);
+      setSelectedFeedId(newFeed.id); // Set the new feed as the selected feed
+      fetchArticlesForFeed(newFeed.id); // Fetch articles for the new feed
     } catch (error) {
       console.error("Error adding feed:", error);
     }

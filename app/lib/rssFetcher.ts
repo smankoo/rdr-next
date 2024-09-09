@@ -11,7 +11,7 @@ interface FeedItem {
   imageUrl?: string;
 }
 
-export async function fetchFeedContent(url: string): Promise<FeedItem[]> {
+export async function fetchFeed(url: string): Promise<FeedItem[]> {
   if (typeof window !== "undefined") {
     throw new Error("This function can only be called on the server side");
   }

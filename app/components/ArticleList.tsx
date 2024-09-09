@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Article } from "@/app/types";
 import { ArticleItem } from "@/app/components/ArticleItem";
@@ -6,10 +6,10 @@ import { Spinner } from "@/app/components/ui/spinner";
 
 interface ArticleListProps {
   articles: Article[];
-  isLoading?: boolean;
+  isLoading: boolean;
 }
 
-export const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading = false }) => {
+function ArticleList({ articles, isLoading }: ArticleListProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -51,6 +51,6 @@ export const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading = 
       </div>
     </ScrollArea>
   );
-};
+}
 
 export default ArticleList;

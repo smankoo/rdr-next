@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Sidebar } from "@/app/components/Sidebar";
 import { Header } from "@/app/components/Header";
-import { ArticleList } from "@/app/components/ArticleList";
+import ArticleList from "@/app/components/ArticleList";
 import { Feed, Article } from "@/app/types";
 import { fetchArticles } from "@/app/lib/feedUtils";
 
@@ -22,6 +22,12 @@ export function HomePage() {
     fetchFeeds();
     fetchAllArticles();
   }, []);
+
+  useEffect(() => {
+    if (selectedFeedId) {
+      fetchArticlesForFeed(selectedFeedId);
+    }
+  }, [selectedFeedId]);
 
   const fetchFeeds = async () => {
     try {
@@ -77,7 +83,20 @@ export function HomePage() {
     }
   };
 
-  const displayedArticles = selectedFeedId ? articles.filter((article) => article.feedId === selectedFeedId) : articles;
+  const fetchArticlesForFeed = async (feedId: string) => {
+    setIsLoading(true);
+    try {
+      const fetchedArticles = await fetchArticles(feedId);
+      console.log(`Fetched articles for feed ${feedId}:`, fetchedArticles);
+      setArticles(fetchedArticles);
+    } catch (error) {
+      console.error("Error fetching articles for feed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const displayedArticles = selectedFeedId ? articles : articles;
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -93,6 +112,7 @@ export function HomePage() {
         setNewFeedName={setNewFeedName}
         isAddFeedOpen={isAddFeedOpen}
         setIsAddFeedOpen={setIsAddFeedOpen}
+        setFeeds={setFeeds} // Add this line
       />
       <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
         <Header />

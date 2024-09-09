@@ -1,15 +1,13 @@
-import { Article } from "../types";
+import { Article } from "@/app/types";
 
-export async function fetchArticles(): Promise<Article[]> {
-  const response = await fetch("/api/articles");
-  if (!response.ok) {
-    throw new Error("Failed to fetch articles");
+export async function fetchArticles(feedId?: string): Promise<Article[]> {
+  try {
+    const url = feedId ? `/api/articles?feedId=${feedId}` : "/api/articles";
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch articles");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    throw error;
   }
-  const articles = await response.json();
-  return articles.map((article: any) => ({
-    ...article,
-    pubDate: new Date(article.pubDate),
-    content: article.content || article.description || "",
-    categories: article.categories as string[] | null,
-  }));
 }

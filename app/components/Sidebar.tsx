@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/app/components/ui/input";
 import { Feed } from "@/app/types";
 import { useResizable } from "@/app/hooks/useResizable";
+import { useState } from "react";
 
 interface SidebarProps {
   feeds: Feed[];
@@ -20,6 +21,7 @@ interface SidebarProps {
   setNewFeedName: (name: string) => void;
   isAddFeedOpen: boolean;
   setIsAddFeedOpen: (isOpen: boolean) => void;
+  setFeeds: React.Dispatch<React.SetStateAction<Feed[]>>; // Add this line
 }
 
 export function Sidebar({
@@ -34,8 +36,25 @@ export function Sidebar({
   setNewFeedName,
   isAddFeedOpen,
   setIsAddFeedOpen,
+  setFeeds, // Add this line
 }: SidebarProps) {
   const { width, startResizing } = useResizable(256, 200, 400);
+
+  const handleAddFeed = async (url: string) => {
+    try {
+      const response = await fetch("/api/feeds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      if (!response.ok) throw new Error("Failed to add feed");
+      const newFeed = await response.json();
+      setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
+      setSelectedFeedId(newFeed.id);
+    } catch (error) {
+      console.error("Error adding feed:", error);
+    }
+  };
 
   return (
     <aside className="p-4 hidden md:block relative" style={{ width: `${width}px` }}>

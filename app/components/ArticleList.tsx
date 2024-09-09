@@ -1,58 +1,66 @@
-import React from "react";
-import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { Article, Feed } from "@/app/types";
-import { ArticleItem } from "@/app/components/ArticleItem";
-import { Spinner } from "@/app/components/ui/spinner";
+import React, { useState } from "react";
+import Image from "next/image";
+import { timeAgo } from "@/app/lib/utils";
+import ArticleModal from "./ArticleModal";
+
+interface Article {
+  id: string;
+  title: string;
+  description: string;
+  pubDate: string;
+  author?: string;
+  imageUrl?: string;
+  link: string;
+}
 
 interface ArticleListProps {
   articles: Article[];
-  isLoading: boolean;
-  feeds: Feed[]; // Add this line
 }
 
-function ArticleList({ articles, isLoading, feeds }: ArticleListProps) {
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (articles.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No articles found</h3>
-        </div>
-      </div>
-    );
-  }
+const ArticleList: React.FC<ArticleListProps> = ({ articles }) => {
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-4 space-y-4">
-        {articles.map((article) => {
-          const feed = feeds.find((f) => f.id === article.feedId);
-          return <ArticleItem key={article.id} article={article} feedName={feed ? feed.name : "Unknown Feed"} />;
-        })}
-      </div>
-    </ScrollArea>
+    <div className="space-y-6 p-4 md:px-6 lg:px-8">
+      {articles.map((article) => (
+        <div key={article.id} className="bg-white rounded-lg shadow-md overflow-hidden flex">
+          {article.imageUrl && (
+            <div className="flex-shrink-0 w-40 h-40">
+              <Image
+                src={article.imageUrl}
+                alt={article.title}
+                width={160}
+                height={160}
+                className="object-cover w-full h-full rounded-md"
+              />
+            </div>
+          )}
+          <div className="p-4 flex-grow">
+            <h2
+              className="text-xl font-semibold mb-2 cursor-pointer hover:text-blue-600"
+              onClick={() => setSelectedArticle(article)}
+            >
+              {article.title}
+            </h2>
+            <div className="text-sm text-gray-600 mb-2">
+              {article.author && <span className="mr-4">By {article.author}</span>}
+              <span>{timeAgo(article.pubDate)}</span>
+            </div>
+            <p className="text-gray-700 mb-2 line-clamp-2">{article.description}</p>
+            <a
+              href={article.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline text-sm"
+            >
+              Read more
+            </a>
+          </div>
+        </div>
+      ))}
+      {selectedArticle && <ArticleModal article={selectedArticle} onClose={() => setSelectedArticle(null)} />}
+    </div>
   );
-}
+};
 
 export default ArticleList;

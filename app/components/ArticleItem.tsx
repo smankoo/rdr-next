@@ -11,7 +11,13 @@ export function ArticleItem({ article, feedName }: ArticleItemProps) {
   return (
     <div className="flex space-x-4 p-4 bg-card rounded-lg shadow-sm">
       {article.imageUrl && (
-        <img src={article.imageUrl} alt={article.title} className="w-24 h-24 object-cover rounded-md" />
+        <div className="article-image-container !w-40 !h-40 flex-shrink-0 overflow-hidden">
+          <img
+            src={article.imageUrl}
+            alt={article.title}
+            className="article-image !w-full !h-full !object-cover rounded-md"
+          />
+        </div>
       )}
       <div className="flex-1">
         <h3 className="text-lg font-semibold">{article.title}</h3>

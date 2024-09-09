@@ -106,12 +106,25 @@ function parseAtom(feed: any): FeedItem[] {
   const entries = feed.entry;
   return entries.map((entry: any) => {
     let imageUrl: string | undefined;
+    let description: string = "";
 
-    // Extract image URL from content
+    // Extract image URL and description from content
     if (entry.content && entry.content[0]._) {
-      const match = entry.content[0]._.match(/<img.*?src="(.*?)"/);
-      if (match) {
-        imageUrl = match[1];
+      const content = entry.content[0]._;
+
+      // Extract image URL
+      const imageMatch = content.match(/<img.*?src="(.*?)"/);
+      if (imageMatch) {
+        imageUrl = imageMatch[1];
+      }
+
+      // Extract description
+      const descriptionMatch = content.match(/<\/figure>([\s\S]*)/);
+      if (descriptionMatch) {
+        // Remove HTML tags and trim
+        description = descriptionMatch[1].replace(/<[^>]*>/g, "").trim();
+        // Limit description to first 500 characters
+        description = description.substring(0, 500) + (description.length > 500 ? "..." : "");
       }
     }
 
@@ -124,7 +137,7 @@ function parseAtom(feed: any): FeedItem[] {
 
     return {
       title: entry.title[0],
-      content: entry.content ? entry.content[0]._ || entry.content[0] : "",
+      content: description, // Use the extracted description instead of full content
       link: entry.link[0].$.href,
       pubDate: entry.published[0] || entry.updated[0],
       author: entry.author ? entry.author[0].name[0] : undefined,

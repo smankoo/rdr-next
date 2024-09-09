@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { Article } from "@/app/types";
+import { Article, Feed } from "@/app/types";
 import { ArticleItem } from "@/app/components/ArticleItem";
 import { Spinner } from "@/app/components/ui/spinner";
 
 interface ArticleListProps {
   articles: Article[];
   isLoading: boolean;
+  feeds: Feed[]; // Add this line
 }
 
-function ArticleList({ articles, isLoading }: ArticleListProps) {
+function ArticleList({ articles, isLoading, feeds }: ArticleListProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -45,9 +46,10 @@ function ArticleList({ articles, isLoading }: ArticleListProps) {
   return (
     <ScrollArea className="flex-1">
       <div className="p-4 space-y-4">
-        {articles.map((article) => (
-          <ArticleItem key={article.id} article={article} />
-        ))}
+        {articles.map((article) => {
+          const feed = feeds.find((f) => f.id === article.feedId);
+          return <ArticleItem key={article.id} article={article} feedName={feed ? feed.name : "Unknown Feed"} />;
+        })}
       </div>
     </ScrollArea>
   );

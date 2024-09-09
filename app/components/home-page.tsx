@@ -132,7 +132,11 @@ export function HomePage() {
             </Button>
           ))}
         </div>
-        <ArticleList articles={displayedArticles} isLoading={isLoading} />
+        <ArticleList
+          articles={displayedArticles}
+          isLoading={isLoading}
+          feeds={feeds} // Add this line
+        />
       </main>
     </div>
   );

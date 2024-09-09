@@ -14,6 +14,28 @@ interface ArticleModalProps {
   onClose: () => void;
 }
 
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop stop-color="#f6f7f8" offset="0%">
+        <animate attributeName="offset" values="-2; 1" dur="2s" repeatCount="indefinite" />
+      </stop>
+      <stop stop-color="#edeef1" offset="50%">
+        <animate attributeName="offset" values="-1; 2" dur="2s" repeatCount="indefinite" />
+      </stop>
+      <stop stop-color="#f6f7f8" offset="100%">
+        <animate attributeName="offset" values="0; 3" dur="2s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="url(#g)" />
+</svg>
+`;
+
+const toBase64 = (str: string) =>
+  typeof window === "undefined" ? Buffer.from(str).toString("base64") : window.btoa(str);
+
 const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -64,13 +86,15 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             {article.title}
           </h2>
           {article.imageUrl && (
-            <div className="mb-6">
+            <div className="mb-6 relative aspect-w-16 aspect-h-9">
               <Image
                 src={article.imageUrl}
                 alt={article.title}
-                width={1200}
-                height={600}
-                className="rounded-lg object-cover w-full shadow-md"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg shadow-md"
+                placeholder="blur"
+                blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(1200, 675))}`}
               />
             </div>
           )}

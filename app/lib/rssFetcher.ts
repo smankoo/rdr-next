@@ -1,5 +1,4 @@
 import type { ParsedUrlQuery } from "querystring";
-import { emitSSEEvent } from "./sseHandler";
 
 interface FeedItem {
   title: string;
@@ -69,9 +68,6 @@ export async function fetchFeed(url: string): Promise<FeedItem[]> {
           feedItems.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
           resolve(feedItems);
-
-          // Emit SSE event after successful fetch
-          emitSSEEvent("feedUpdated", { url });
         }
       });
     });

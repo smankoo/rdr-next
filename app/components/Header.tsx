@@ -2,6 +2,7 @@ import React from "react";
 import { Search, Settings } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+import { getPlaceholderImage } from "@/app/lib/imageUtils";
 
 export function Header() {
   return (
@@ -17,7 +18,7 @@ export function Header() {
           <span className="sr-only">Settings</span>
         </Button>
         <Avatar>
-          <AvatarImage src="/placeholder-user.jpg" alt="User" />
+          <AvatarImage src={getPlaceholderImage(40, "User")} alt="User" />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
       </div>

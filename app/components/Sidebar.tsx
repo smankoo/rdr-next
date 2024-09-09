@@ -47,13 +47,15 @@ export function Sidebar({
       <ScrollArea className="h-[calc(100vh-8rem)]">
         {feeds.map((feed) => (
           <Collapsible key={feed.id}>
-            <CollapsibleTrigger
+            <div
               className={`flex items-center justify-between w-full p-2 hover:bg-accent rounded-md cursor-pointer ${
                 selectedFeedId === feed.id ? "bg-accent" : ""
               }`}
               onClick={() => setSelectedFeedId(feed.id)}
             >
-              <span>{feed.name}</span>
+              <CollapsibleTrigger asChild>
+                <span className="flex-grow">{feed.name}</span>
+              </CollapsibleTrigger>
               <div className="flex items-center">
                 <Button
                   variant="ghost"
@@ -82,7 +84,7 @@ export function Sidebar({
                 </Button>
                 <ChevronRight className="h-4 w-4" />
               </div>
-            </CollapsibleTrigger>
+            </div>
           </Collapsible>
         ))}
       </ScrollArea>

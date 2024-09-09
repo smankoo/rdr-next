@@ -6,6 +6,7 @@ import { Sidebar } from "@/app/components/Sidebar";
 import { Header } from "@/app/components/Header";
 import { ArticleList } from "@/app/components/ArticleList";
 import { Feed, Article } from "@/app/types";
+import { fetchArticles } from "@/app/lib/feedUtils";
 
 export function HomePage() {
   const [activeFilter, setActiveFilter] = React.useState("All Feeds");
@@ -14,9 +15,12 @@ export function HomePage() {
   const [newFeedUrl, setNewFeedUrl] = useState("");
   const [newFeedName, setNewFeedName] = useState("");
   const [isAddFeedOpen, setIsAddFeedOpen] = useState(false);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchFeeds();
+    fetchAllArticles();
   }, []);
 
   const fetchFeeds = async () => {
@@ -60,9 +64,20 @@ export function HomePage() {
     }
   };
 
-  const displayedArticles = selectedFeedId
-    ? feeds.find((feed) => feed.id === selectedFeedId)?.articles || []
-    : feeds.flatMap((feed) => feed.articles);
+  const fetchAllArticles = async () => {
+    setIsLoading(true);
+    try {
+      const fetchedArticles = await fetchArticles();
+      console.log("Fetched articles in home-page:", fetchedArticles);
+      setArticles(fetchedArticles);
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const displayedArticles = selectedFeedId ? articles.filter((article) => article.feedId === selectedFeedId) : articles;
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -95,8 +110,10 @@ export function HomePage() {
             </Button>
           ))}
         </div>
-        <ArticleList articles={displayedArticles} />
+        <ArticleList articles={displayedArticles} isLoading={isLoading} />
       </main>
     </div>
   );
+
+  console.log("Displayed articles:", displayedArticles);
 }

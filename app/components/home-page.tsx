@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Sidebar } from "@/app/components/Sidebar";
 import { Header } from "@/app/components/Header";
@@ -9,7 +9,7 @@ import { Feed, Article } from "@/app/types";
 import { fetchArticles } from "@/app/lib/feedUtils";
 
 export function HomePage() {
-  const [activeFilter, setActiveFilter] = React.useState("All Feeds");
+  const [activeFilter, setActiveFilter] = useState<"All Articles" | "Unread">("All Articles");
   const [feeds, setFeeds] = useState<Feed[]>([]);
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [newFeedUrl, setNewFeedUrl] = useState("");
@@ -112,20 +112,24 @@ export function HomePage() {
 
   const filterButtons = (
     <>
-      {["All Articles", "Unread", "Starred"].map((filter) => (
+      {["All Articles", "Unread"].map((filter) => (
         <Button
           key={filter}
           variant={activeFilter === filter ? "default" : "outline"}
-          onClick={() => {
-            setActiveFilter(filter);
-            setSelectedFeedId(null);
-          }}
+          onClick={() => setActiveFilter(filter as "All Articles" | "Unread")}
         >
           {filter}
         </Button>
       ))}
     </>
   );
+
+  const filteredArticles = useCallback(() => {
+    if (activeFilter === "Unread") {
+      return articles.filter((article) => !article.isRead);
+    }
+    return articles;
+  }, [articles, activeFilter]);
 
   const displayedArticles = selectedFeedId ? articles : articles;
 
@@ -197,7 +201,7 @@ export function HomePage() {
           fetchAllArticles={fetchAllArticles}
         />
         <ArticleList
-          articles={displayedArticles}
+          articles={filteredArticles()}
           isLoading={isLoading}
           feeds={feeds} // Add this line
           markArticleAsRead={markArticleAsRead}

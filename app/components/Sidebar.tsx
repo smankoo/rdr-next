@@ -70,6 +70,30 @@ export function Sidebar({
     }
   };
 
+  const handleDeleteFeed = async (feedId: string) => {
+    const feedIndex = feeds.findIndex((feed) => feed.id === feedId);
+
+    // Delete the feed
+    await deleteFeed(feedId);
+
+    // Update selected feed
+    if (selectedFeedId === feedId) {
+      if (feedIndex > 0) {
+        // Set the feed above the deleted one as selected
+        setSelectedFeedId(feeds[feedIndex - 1].id);
+      } else if (feeds.length > 1) {
+        // If it was the first feed, select the next one
+        setSelectedFeedId(feeds[1].id);
+      } else {
+        // If it was the only feed, clear selection
+        setSelectedFeedId(null);
+      }
+    }
+
+    // No need to manually refresh the feeds list here,
+    // as it should be handled by the parent component
+  };
+
   return (
     <aside className="p-4 hidden md:block relative" style={{ width: `${width}px` }}>
       <div
@@ -129,7 +153,7 @@ export function Sidebar({
         setIsOpen={setIsSettingsOpen}
         editingFeed={editingFeed}
         updateFeed={updateFeed}
-        deleteFeed={deleteFeed}
+        deleteFeed={handleDeleteFeed} // Pass the handleDeleteFeed function here
       />
     </aside>
   );

@@ -1,8 +1,9 @@
 import React from "react";
-import { Search, Settings } from "lucide-react";
+import { Search, Settings, RefreshCw } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { getPlaceholderImage } from "@/app/lib/imageUtils";
+import { useState } from "react";
 
 interface HeaderProps {
   feedName: string;
@@ -10,8 +11,26 @@ interface HeaderProps {
 }
 
 export function Header({ feedName, filterButtons }: HeaderProps) {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const response = await fetch("/api/feeds/refresh", { method: "POST" });
+      if (!response.ok) {
+        throw new Error("Failed to refresh feeds");
+      }
+      // You might want to trigger a re-fetch of articles here or use a state management solution to update the UI
+    } catch (error) {
+      console.error("Error refreshing feeds:", error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
-    <header className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+    <header className="flex items-center justify-between p-4 bg-white border-b">
       <div className="flex items-center space-x-4">
         <div className="flex flex-col">
           <h1 className="text-3xl font-bold text-indigo-700">Reader</h1>
@@ -33,6 +52,13 @@ export function Header({ feedName, filterButtons }: HeaderProps) {
           <AvatarImage src={getPlaceholderImage(40, "User")} alt="User" />
           <AvatarFallback className="bg-indigo-100 text-indigo-700">U</AvatarFallback>
         </Avatar>
+        <button
+          onClick={handleRefresh}
+          className={`p-2 rounded-full hover:bg-gray-100 ${isRefreshing ? "animate-spin" : ""}`}
+          disabled={isRefreshing}
+        >
+          <RefreshCw className="w-5 h-5" />
+        </button>
       </div>
     </header>
   );

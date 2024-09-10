@@ -1,6 +1,6 @@
 import type { ParsedUrlQuery } from "querystring";
 
-interface FeedItem {
+export interface FeedItem {
   title: string;
   content: string;
   link: string;

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import { Article, Feed } from "@/app/types";
 import ArticleModal from "./ArticleModal";
 import { ArticleItem } from "./ArticleItem";
@@ -9,8 +10,27 @@ interface ArticleListProps {
   feeds: Feed[];
 }
 
+const ARTICLES_PER_PAGE = 10;
+
 const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds }) => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [displayedArticles, setDisplayedArticles] = useState<Article[]>([]);
+  const [page, setPage] = useState(1);
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+  });
+
+  useEffect(() => {
+    setDisplayedArticles(articles.slice(0, ARTICLES_PER_PAGE));
+  }, [articles]);
+
+  useEffect(() => {
+    if (inView && !isLoading) {
+      const nextArticles = articles.slice(0, (page + 1) * ARTICLES_PER_PAGE);
+      setDisplayedArticles(nextArticles);
+      setPage(page + 1);
+    }
+  }, [inView, isLoading, articles, page]);
 
   const getFeedName = (feedId: string) => {
     const feed = feeds.find((f) => f.id === feedId);
@@ -20,9 +40,9 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds })
   return (
     <div className="h-full overflow-hidden flex flex-col">
       <div className="flex-grow overflow-y-auto">
-        {articles.length > 0 ? (
+        {displayedArticles.length > 0 ? (
           <div className="space-y-6 p-4 md:px-6 lg:px-8">
-            {articles.map((article) => (
+            {displayedArticles.map((article) => (
               <div key={article.id} onClick={() => setSelectedArticle(article)}>
                 <ArticleItem
                   article={article}
@@ -31,6 +51,9 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds })
                 />
               </div>
             ))}
+            {displayedArticles.length < articles.length && (
+              <div ref={ref} className="h-10" /> // Intersection observer target
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full">

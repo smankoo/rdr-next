@@ -76,9 +76,14 @@ function parseRSS(rss: any): FeedItem[] {
     }
 
     // Check for media:thumbnail or media:content
-    if (!imageUrl && item["media:thumbnail"]) {
+    if (!imageUrl && item["media:thumbnail"]?.[0]?.$ && item["media:thumbnail"][0].$.url) {
       imageUrl = item["media:thumbnail"][0].$.url;
-    } else if (!imageUrl && item["media:content"] && item["media:content"][0].$.medium === "image") {
+    } else if (
+      !imageUrl &&
+      item["media:content"]?.[0]?.$ &&
+      item["media:content"][0].$.medium === "image" &&
+      item["media:content"][0].$.url
+    ) {
       imageUrl = item["media:content"][0].$.url;
     }
 
@@ -95,9 +100,10 @@ function parseRSS(rss: any): FeedItem[] {
       content: item.description[0],
       link: item.link[0],
       pubDate: item.pubDate[0],
-      author: item.author ? item.author[0] : undefined,
+      // author: item.author ? item.author[0] : undefined,
       categories: item.category,
       imageUrl,
+      author: item["dc:creator"] ? item["dc:creator"][0] : undefined,
     };
   });
 }

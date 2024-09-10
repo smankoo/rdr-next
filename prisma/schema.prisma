@@ -32,6 +32,7 @@ model Article {
   feed        Feed     @relation(fields: [feedId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  author      String?
 
   @@unique([feedId, link])
 }

@@ -24,6 +24,7 @@ export async function POST(request: Request) {
           pubDate: new Date(item.pubDate),
           feedId: feed.id,
           imageUrl: item.imageUrl || "",
+          author: item.author || "",
         },
       });
     }

@@ -167,7 +167,12 @@ export function HomePage() {
         updateFeed={updateFeed} // Add this line
       />
       <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
-        <Header feedName={currentFeedName} filterButtons={filterButtons} lastRefreshed={lastRefreshed} />
+        <Header
+          feedName={currentFeedName}
+          filterButtons={filterButtons}
+          lastRefreshed={lastRefreshed}
+          fetchAllArticles={fetchAllArticles}
+        />
         <ArticleList
           articles={displayedArticles}
           isLoading={isLoading}

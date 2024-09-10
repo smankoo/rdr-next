@@ -10,9 +10,10 @@ interface HeaderProps {
   feedName: string;
   filterButtons: React.ReactNode;
   lastRefreshed: Date | null; // Change this to allow null
+  fetchAllArticles: () => Promise<void>;
 }
 
-export function Header({ feedName, filterButtons, lastRefreshed }: HeaderProps) {
+export function Header({ feedName, filterButtons, lastRefreshed, fetchAllArticles }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -22,7 +23,7 @@ export function Header({ feedName, filterButtons, lastRefreshed }: HeaderProps) 
       if (!response.ok) {
         throw new Error("Failed to refresh feeds");
       }
-      // You might want to trigger a re-fetch of articles here or use a state management solution to update the UI
+      await fetchAllArticles();
     } catch (error) {
       console.error("Error refreshing feeds:", error);
       // You might want to show an error message to the user here

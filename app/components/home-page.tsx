@@ -66,7 +66,14 @@ export function HomePage() {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete feed");
-      setFeeds((prevFeeds) => prevFeeds.filter((feed) => feed.id !== feedId));
+      setFeeds((prevFeeds) => {
+        const updatedFeeds = prevFeeds.filter((feed) => feed.id !== feedId);
+        if (updatedFeeds.length === 0) {
+          setArticles([]);
+          setSelectedFeedId(null);
+        }
+        return updatedFeeds;
+      });
     } catch (error) {
       console.error("Error deleting feed:", error);
     }

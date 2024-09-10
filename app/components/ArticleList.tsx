@@ -74,7 +74,8 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds })
           article={{
             ...selectedArticle,
             description: selectedArticle.description || "",
-            pubDate: selectedArticle.pubDate.toISOString(), // Convert Date to string
+            author: selectedArticle.author ?? undefined,
+            imageUrl: selectedArticle.imageUrl ?? undefined,
           }}
           onClose={() => setSelectedArticle(null)}
         />

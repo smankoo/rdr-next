@@ -38,6 +38,13 @@ export function FeedSettingsModal({ isOpen, setIsOpen, editingFeed, updateFeed, 
     }
   };
 
+  const handleDeleteFeed = () => {
+    if (editingFeed) {
+      deleteFeed(editingFeed.id);
+      setIsOpen(false); // Close the modal after deleting
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="bg-white">
@@ -59,7 +66,7 @@ export function FeedSettingsModal({ isOpen, setIsOpen, editingFeed, updateFeed, 
           onKeyDown={handleKeyDown}
         />
         <div className="flex justify-between">
-          <Button variant="destructive" onClick={() => editingFeed && deleteFeed(editingFeed.id)}>
+          <Button variant="destructive" onClick={handleDeleteFeed}>
             Delete
           </Button>
           <div>

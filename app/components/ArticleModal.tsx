@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { formatDate } from "@/app/lib/utils";
 
@@ -38,6 +38,7 @@ const toBase64 = (str: string) =>
 
 const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -90,14 +91,20 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
           <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
           {article.imageUrl && (
             <div className="mb-6 relative aspect-w-16 aspect-h-9">
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+              )}
               <Image
                 src={article.imageUrl}
                 alt={article.title}
                 layout="fill"
                 objectFit="cover"
-                className="rounded-lg shadow-md"
+                className={`rounded-lg shadow-md ${
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                } transition-opacity duration-300`}
                 placeholder="blur"
                 blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(1200, 675))}`}
+                onLoadingComplete={() => setImageLoaded(true)}
               />
             </div>
           )}

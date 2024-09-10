@@ -31,17 +31,19 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
         </p>
         <p className="mt-2 text-sm text-gray-700 line-clamp-3 cursor-default">{article.description}</p>
         <div className="flex-grow"></div>
-        <a
-          href={article.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-blue-600 hover:underline cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          Read more
-        </a>
+        <div className="mt-2">
+          <a
+            href={article.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block text-blue-600 hover:underline cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            Read more
+          </a>
+        </div>
       </div>
     </div>
   );

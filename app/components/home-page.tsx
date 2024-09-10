@@ -105,9 +105,10 @@ export function HomePage() {
     }
   };
 
-  const currentFeedName = selectedFeedId
-    ? feeds.find((feed) => feed.id === selectedFeedId)?.name || "Unknown Feed"
-    : "All Feeds";
+  const currentFeed = selectedFeedId ? feeds.find((feed) => feed.id === selectedFeedId) : null;
+
+  const currentFeedName = currentFeed?.name || "All Feeds";
+  const lastRefreshed = currentFeed?.lastRefreshed ? new Date(currentFeed.lastRefreshed) : null;
 
   const filterButtons = (
     <>
@@ -166,7 +167,7 @@ export function HomePage() {
         updateFeed={updateFeed} // Add this line
       />
       <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
-        <Header feedName={currentFeedName} filterButtons={filterButtons} />
+        <Header feedName={currentFeedName} filterButtons={filterButtons} lastRefreshed={lastRefreshed} />
         <ArticleList
           articles={displayedArticles}
           isLoading={isLoading}

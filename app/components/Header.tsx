@@ -3,14 +3,16 @@ import { Search, Settings, RefreshCw } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { getPlaceholderImage } from "@/app/lib/imageUtils";
+import { timeAgo } from "@/app/lib/utils"; // Import the timeAgo function
 import { useState } from "react";
 
 interface HeaderProps {
   feedName: string;
   filterButtons: React.ReactNode;
+  lastRefreshed: Date | null; // Change this to allow null
 }
 
-export function Header({ feedName, filterButtons }: HeaderProps) {
+export function Header({ feedName, filterButtons, lastRefreshed }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -35,6 +37,7 @@ export function Header({ feedName, filterButtons }: HeaderProps) {
         <div className="flex flex-col">
           <h1 className="text-3xl font-bold text-indigo-700">Reader</h1>
           <h2 className="text-sm font-medium text-indigo-500 mt-1">{feedName}</h2>
+          {lastRefreshed && <p className="text-xs text-gray-500 mt-1">Last refreshed {timeAgo(lastRefreshed)}</p>}
         </div>
         <div className="h-8 w-px bg-indigo-200 mx-2" />
         {filterButtons}

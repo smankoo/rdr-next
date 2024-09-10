@@ -29,11 +29,10 @@ export async function addArticlesToDatabase(articles: FeedItem[], feedId: string
       await prisma.article.create({
         data: {
           title: article.title,
-          content: article.content,
+          description: article.description || "", // Add fallback
           link: article.link,
           pubDate: new Date(article.pubDate),
           author: article.author || null,
-          categories: article.categories || [],
           imageUrl: article.imageUrl || null,
           feedId: feedId,
         },

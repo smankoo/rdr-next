@@ -2,7 +2,7 @@ import type { ParsedUrlQuery } from "querystring";
 
 export interface FeedItem {
   title: string;
-  content: string;
+  description?: string; // Add this line
   link: string;
   pubDate: string;
   author?: string;
@@ -97,7 +97,7 @@ function parseRSS(rss: any): FeedItem[] {
 
     return {
       title: item.title[0],
-      content: item.description[0],
+      description: item.description[0],
       link: item.link[0],
       pubDate: item.pubDate[0],
       // author: item.author ? item.author[0] : undefined,

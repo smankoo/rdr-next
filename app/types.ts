@@ -18,4 +18,5 @@ export interface Article {
   feedId: string;
   createdAt: Date;
   updatedAt: Date;
+  isRead: boolean;
 }

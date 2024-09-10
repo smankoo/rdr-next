@@ -149,6 +149,29 @@ export function HomePage() {
     }
   };
 
+  const markArticleAsRead = async (articleId: string) => {
+    const isRead = true;
+    try {
+      const response = await fetch(`/api/articles/${articleId}/read`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isRead }),
+      });
+
+      if (response.ok) {
+        setArticles((prevArticles) =>
+          prevArticles.map((article) => (article.id === articleId ? { ...article, isRead } : article))
+        );
+      } else {
+        console.error("Failed to mark article as read");
+      }
+    } catch (error) {
+      console.error("Error marking article as read:", error);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar
@@ -177,6 +200,7 @@ export function HomePage() {
           articles={displayedArticles}
           isLoading={isLoading}
           feeds={feeds} // Add this line
+          markArticleAsRead={markArticleAsRead}
         />
       </main>
     </div>

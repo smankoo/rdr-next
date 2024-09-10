@@ -141,7 +141,7 @@ function parseAtom(feed: any): FeedItem[] {
 
     return {
       title: entry.title[0],
-      content: description, // Use the extracted description instead of full content
+      description: description, // Use the extracted description instead of full content
       link: entry.link[0].$.href,
       pubDate: entry.published[0] || entry.updated[0],
       author: entry.author ? entry.author[0].name[0] : undefined,

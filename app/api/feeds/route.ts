@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         data: {
           title: item.title || "",
           link: item.link || "",
-          description: item.content || "", // This now contains the cleaned description
+          description: item.description || "", // This now contains the cleaned description
           pubDate: new Date(item.pubDate),
           feedId: feed.id,
           imageUrl: item.imageUrl || "",

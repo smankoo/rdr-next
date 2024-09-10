@@ -33,6 +33,7 @@ model Article {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   author      String?
+  isRead      Boolean  @default(false)
 
   @@unique([feedId, link])
 }

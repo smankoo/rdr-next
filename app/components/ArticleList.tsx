@@ -8,11 +8,12 @@ interface ArticleListProps {
   articles: Article[];
   isLoading: boolean;
   feeds: Feed[];
+  markArticleAsRead: (articleId: string, isRead: boolean) => void;
 }
 
 const ARTICLES_PER_PAGE = 10;
 
-const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds }) => {
+const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, markArticleAsRead }) => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [displayedArticles, setDisplayedArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -47,7 +48,10 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds })
                 <ArticleItem
                   article={article}
                   feedName={getFeedName(article.feedId)}
-                  onTitleClick={() => setSelectedArticle(article)}
+                  onTitleClick={() => {
+                    setSelectedArticle(article);
+                    markArticleAsRead(article.id);
+                  }}
                 />
               </div>
             ))}

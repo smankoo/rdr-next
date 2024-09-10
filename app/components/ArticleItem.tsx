@@ -31,6 +31,8 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
           <span className="font-semibold text-indigo-600">{feedName}</span>
           <span className="mx-2 text-gray-300">•</span>
           <span>{timeAgo(article.pubDate)}</span>
+          <span className="mx-2 text-gray-300">•</span>
+          {article.isRead ? <span>Read</span> : <span>Unread</span>}
         </p>
         <p className="mt-2 text-base text-gray-600 line-clamp-3">{article.description}</p>
         <div className="flex-grow"></div>

@@ -36,12 +36,23 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
             href={article.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block text-blue-600 hover:underline cursor-pointer"
+            className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-all duration-300 ease-in-out group"
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            Read more
+            <span className="border-b border-transparent group-hover:border-indigo-800 transition-all duration-300 ease-in-out">
+              Read more
+            </span>
+            <svg
+              className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300 ease-in-out"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </a>
         </div>
       </div>

@@ -3,17 +3,23 @@ import { useInView } from "react-intersection-observer";
 import { Article, Feed } from "@/app/types";
 import ArticleModal from "./ArticleModal";
 import { ArticleItem } from "./ArticleItem";
-
 interface ArticleListProps {
   articles: Article[];
   isLoading: boolean;
   feeds: Feed[];
   markArticleAsRead: (articleId: string, isRead: boolean) => void;
+  fetchAllArticles: () => void;
 }
 
 const ARTICLES_PER_PAGE = 10;
 
-const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, markArticleAsRead }) => {
+const ArticleList: React.FC<ArticleListProps> = ({
+  articles,
+  isLoading,
+  feeds,
+  markArticleAsRead,
+  fetchAllArticles,
+}) => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [displayedArticles, setDisplayedArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -81,7 +87,9 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, m
             author: selectedArticle.author ?? undefined,
             imageUrl: selectedArticle.imageUrl ?? undefined,
           }}
-          onClose={() => setSelectedArticle(null)}
+          onClose={() => {
+            setSelectedArticle(null);
+          }}
         />
       )}
     </div>

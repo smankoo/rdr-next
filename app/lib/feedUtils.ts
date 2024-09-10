@@ -40,15 +40,3 @@ export async function addArticlesToDatabase(articles: FeedItem[], feedId: string
     }
   }
 }
-export async function updateArticleReadStatus(articleId: string, isRead: boolean) {
-  try {
-    const updatedArticle = await prisma.article.update({
-      where: { id: articleId },
-      data: { isRead: isRead },
-    });
-    return updatedArticle;
-  } catch (error) {
-    console.error("Error updating article read status:", error);
-    return null;
-  }
-}

@@ -205,6 +205,7 @@ export function HomePage() {
           isLoading={isLoading}
           feeds={feeds} // Add this line
           markArticleAsRead={markArticleAsRead}
+          fetchAllArticles={fetchAllArticles}
         />
       </main>
     </div>

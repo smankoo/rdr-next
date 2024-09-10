@@ -32,7 +32,17 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
           <span className="mx-2 text-gray-300">•</span>
           <span>{timeAgo(article.pubDate)}</span>
           <span className="mx-2 text-gray-300">•</span>
-          {article.isRead ? <span>Read</span> : <span>Unread</span>}
+          {article.isRead ? (
+            <>
+              <span className="w-2 h-2 bg-gray-400 rounded-full mr-1 inline-block"></span>
+              {/* <span>Read</span> */}
+            </>
+          ) : (
+            <>
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-1 inline-block"></span>
+              {/* <span>Unread</span> */}
+            </>
+          )}
         </p>
         <p className="mt-2 text-base text-gray-600 line-clamp-3">{article.description}</p>
         <div className="flex-grow"></div>

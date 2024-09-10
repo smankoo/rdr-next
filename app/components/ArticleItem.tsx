@@ -10,42 +10,45 @@ interface ArticleItemProps {
 
 export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProps) {
   return (
-    <div className="flex space-x-4 p-4 bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-300 cursor-default">
+    <div className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default">
       {article.imageUrl && (
-        <div className="article-image-container w-40 h-40 flex-shrink-0 overflow-hidden">
+        <div className="article-image-container w-48 h-48 flex-shrink-0 overflow-hidden rounded-lg">
           <img
             src={article.imageUrl}
             alt={article.title}
-            className="article-image w-full h-full object-cover rounded-md"
+            className="article-image w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
       )}
       <div className="flex-1 flex flex-col">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2 hover:text-blue-600 transition-colors duration-200 cursor-default">
+        <h2
+          className="text-xl font-bold text-gray-800 mb-3 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+          onClick={onTitleClick}
+        >
           {article.title}
         </h2>
-        <p className="text-sm text-gray-600 mb-2 cursor-default">
-          <span className="font-medium">{feedName}</span>
-          <span className="mx-2 text-gray-400">•</span>
+        <p className="text-sm text-gray-500 mb-3 flex items-center">
+          <span className="font-semibold text-indigo-600">{feedName}</span>
+          <span className="mx-2 text-gray-300">•</span>
           <span>{timeAgo(article.pubDate)}</span>
         </p>
-        <p className="mt-2 text-sm text-gray-700 line-clamp-3 cursor-default">{article.description}</p>
+        <p className="mt-2 text-base text-gray-600 line-clamp-3">{article.description}</p>
         <div className="flex-grow"></div>
-        <div className="mt-2">
+        <div className="mt-4">
           <a
             href={article.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-all duration-300 ease-in-out group"
+            className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-all duration-300 ease-in-out group"
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            <span className="border-b border-transparent group-hover:border-indigo-800 transition-all duration-300 ease-in-out">
+            <span className="border-b-2 border-transparent group-hover:border-indigo-600 transition-all duration-300 ease-in-out">
               Read more
             </span>
             <svg
-              className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-300 ease-in-out"
+              className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300 ease-in-out"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

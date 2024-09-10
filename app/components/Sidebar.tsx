@@ -3,25 +3,27 @@ import { Plus, ChevronRight, Settings, X } from "lucide-react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger } from "@/app/components/ui/collapsible";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/app/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/app/components/ui/dialog";
 import { Input } from "@/app/components/ui/input";
 import { Feed } from "@/app/types";
 import { useResizable } from "@/app/hooks/useResizable";
+import { AddFeedModal } from "./AddFeedModal";
+import { FeedSettingsModal } from "./FeedSettingsModal";
 
 interface SidebarProps {
   feeds: Feed[];
   selectedFeedId: string | null;
   setSelectedFeedId: (id: string) => void;
   deleteFeed: (id: string) => void;
-  addFeed: (url: string, name: string) => Promise<void>; // Update this line
+  addFeed: (url: string, name: string) => Promise<void>;
   newFeedUrl: string;
   setNewFeedUrl: (url: string) => void;
   newFeedName: string;
   setNewFeedName: (name: string) => void;
   isAddFeedOpen: boolean;
   setIsAddFeedOpen: (isOpen: boolean) => void;
-  setFeeds: React.Dispatch<React.SetStateAction<Feed[]>>; // Add this line
-  updateFeed: (id: string, url: string, name: string) => Promise<void>; // Add this line
+  setFeeds: React.Dispatch<React.SetStateAction<Feed[]>>;
+  updateFeed: (id: string, url: string, name: string) => Promise<void>;
 }
 
 export function Sidebar({
@@ -29,15 +31,15 @@ export function Sidebar({
   selectedFeedId,
   setSelectedFeedId,
   deleteFeed,
-  addFeed, // Update this line
+  addFeed,
   newFeedUrl,
   setNewFeedUrl,
   newFeedName,
   setNewFeedName,
   isAddFeedOpen,
   setIsAddFeedOpen,
-  setFeeds, // Add this line
-  updateFeed, // Add this line
+  setFeeds,
+  updateFeed,
 }: SidebarProps) {
   const { width, startResizing } = useResizable(256, 200, 400);
   const [hoveredFeedId, setHoveredFeedId] = useState<string | null>(null);
@@ -114,61 +116,25 @@ export function Sidebar({
       </ScrollArea>
       <Dialog open={isAddFeedOpen} onOpenChange={setIsAddFeedOpen}>
         <DialogTrigger asChild>
-          <Button className="w-full mt-4" variant="outline">
+          <Button className="w-full mt-4" variant="default">
             <Plus className="mr-2 h-4 w-4" /> Add Feed
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-white">
-          <DialogHeader>
-            <DialogTitle>Add New Feed</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={newFeedUrl}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFeedUrl(e.target.value)}
-            placeholder="Feed URL"
-            className="mb-2"
-          />
-          <Input
-            value={newFeedName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFeedName(e.target.value)}
-            placeholder="Feed Name (optional)"
-            className="mb-2"
-          />
-          <Button onClick={() => addFeed(newFeedUrl, newFeedName)}>Add Feed</Button>
-        </DialogContent>
+        <AddFeedModal
+          newFeedUrl={newFeedUrl}
+          setNewFeedUrl={setNewFeedUrl}
+          newFeedName={newFeedName}
+          setNewFeedName={setNewFeedName}
+          addFeed={addFeed}
+        />
       </Dialog>
-      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-white">
-          <DialogHeader>
-            <DialogTitle>Feed Settings</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={editingFeedUrl}
-            onChange={(e) => setEditingFeedUrl(e.target.value)}
-            placeholder="Feed URL"
-            className="mb-2"
-            onKeyDown={handleKeyDown}
-          />
-          <Input
-            value={editingFeedName}
-            onChange={(e) => setEditingFeedName(e.target.value)}
-            placeholder="Feed Name"
-            className="mb-2"
-            onKeyDown={handleKeyDown}
-          />
-          <div className="flex justify-between">
-            <Button variant="destructive" onClick={() => editingFeed && deleteFeed(editingFeed.id)}>
-              Delete
-            </Button>
-            <div>
-              <Button variant="outline" onClick={() => setIsSettingsOpen(false)} className="mr-2">
-                Cancel
-              </Button>
-              <Button onClick={handleUpdateFeed}>Update</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <FeedSettingsModal
+        isOpen={isSettingsOpen}
+        setIsOpen={setIsSettingsOpen}
+        editingFeed={editingFeed}
+        updateFeed={updateFeed}
+        deleteFeed={deleteFeed}
+      />
     </aside>
   );
 }

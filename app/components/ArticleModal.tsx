@@ -3,6 +3,7 @@ import Image from "next/image";
 import { formatDate } from "@/app/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from "isomorphic-dompurify";
+import { Switch } from "@headlessui/react";
 
 interface ArticleModalProps {
   article: {
@@ -44,6 +45,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const [fullContent, setFullContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDescription, setShowDescription] = useState(true);
+  const [isNewspaperMode, setIsNewspaperMode] = useState(true);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -95,7 +97,13 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     return match ? match[0].trim() : cleanText;
   };
 
-  const sanitizeAndFormatContent = (content: string) => {
+  const getNumberOfSentences = (text: string): number => {
+    const cleanText = text.replace(/<[^>]*>/g, ""); // Remove HTML tags
+    const sentences = cleanText.match(/[^.!?]+[.!?]+/g);
+    return sentences ? sentences.length : 0;
+  };
+
+  const sanitizeAndFormatContent = (content: string, isFirstParagraph: boolean) => {
     const sanitizedContent = DOMPurify.sanitize(content);
     const parser = new DOMParser();
     const doc = parser.parseFromString(sanitizedContent, "text/html");
@@ -105,6 +113,17 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
       p.classList.add("mb-4", "animate-fade-in");
       p.style.animationDelay = `${index * 0.1}s`;
     });
+
+    // Apply large first letter styling to the first paragraph
+    const firstParagraph = doc.querySelector("p");
+    if (isNewspaperMode && firstParagraph && isFirstParagraph) {
+      firstParagraph.classList.add(
+        "first-letter:float-left",
+        "first-letter:text-5xl",
+        "first-letter:pr-2",
+        "first-letter:font-serif"
+      );
+    }
 
     // Add classes to headings for proper styling and animation
     doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading, index) => {
@@ -116,11 +135,11 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     doc.querySelectorAll("blockquote").forEach((quote) => {
       quote.classList.add(
         "border-l-4",
-        "border-blue-500",
         "pl-4",
         "italic",
         "my-4",
-        "text-gray-600",
+        isNewspaperMode ? "border-gray-800" : "border-blue-500",
+        isNewspaperMode ? "text-gray-800" : "text-gray-600",
         "dark:text-gray-400"
       );
     });
@@ -133,11 +152,24 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     return doc.body.innerHTML;
   };
 
+  const newspaperModeClasses = isNewspaperMode
+    ? "font-serif text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-900"
+    : "";
+
+  const contentClasses = `prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md ${
+    isNewspaperMode
+      ? "prose-h1:font-serif prose-h2:font-serif prose-h3:font-serif prose-p:text-justify prose-p:hyphens-auto"
+      : ""
+  }`;
+
+  const descriptionSentences = getNumberOfSentences(article.description);
+  const shouldUseColumns = isNewspaperMode && descriptionSentences > 2;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <motion.div
         ref={modalRef}
-        className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
+        className={`bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl ${newspaperModeClasses}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -223,11 +255,30 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             </span>
           </div>
 
-          {/* Original description - not animated */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <span className="mr-3 text-sm font-medium text-gray-700 dark:text-gray-300">Newspaper Mode</span>
+              <Switch
+                checked={isNewspaperMode}
+                onChange={setIsNewspaperMode}
+                className={`${
+                  isNewspaperMode ? "bg-blue-600" : "bg-gray-200"
+                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+              >
+                <span
+                  className={`${
+                    isNewspaperMode ? "translate-x-6" : "translate-x-1"
+                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                />
+              </Switch>
+            </div>
+          </div>
+
+          {/* Description - now with conditional column layout */}
           {(showDescription || !fullContent) && (
             <div
-              className="prose prose-lg max-w-none dark:prose-invert mb-8"
-              dangerouslySetInnerHTML={{ __html: article.description }}
+              className={`${contentClasses} ${shouldUseColumns ? "columns-2 gap-8" : ""}`}
+              dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(article.description, true) }}
             />
           )}
 
@@ -243,8 +294,8 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
               >
                 {showDescription && <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />}
                 <div
-                  className="prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md"
-                  dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}
+                  className={`${contentClasses} ${isNewspaperMode ? "columns-2 gap-8" : ""}`}
+                  dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent, !showDescription) }}
                 />
                 <div className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">
                   This article was originally published by {article.author || "the author"} on{" "}

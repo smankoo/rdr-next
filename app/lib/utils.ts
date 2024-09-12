@@ -48,3 +48,9 @@ export function calculateReadingTime(content: string): string {
   const minutes = Math.ceil(wordCount / wordsPerMinute);
   return `${minutes} min read`;
 }
+
+export function decodeHTMLEntities(text: string): string {
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = text;
+  return textarea.value;
+}

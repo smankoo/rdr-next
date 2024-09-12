@@ -1,6 +1,6 @@
 import React from "react";
 import { Article } from "@/app/types";
-import { timeAgo, calculateReadingTime } from "@/app/lib/utils";
+import { timeAgo, calculateReadingTime, decodeHTMLEntities } from "@/app/lib/utils";
 
 interface ArticleItemProps {
   article: Article;
@@ -10,6 +10,7 @@ interface ArticleItemProps {
 
 export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProps) {
   const readingTime = calculateReadingTime(article.description);
+  const decodedDescription = article.description ? decodeHTMLEntities(article.description) : "";
 
   return (
     <div className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default">
@@ -48,7 +49,7 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
             </>
           )}
         </p>
-        <p className="mt-2 text-base text-gray-600 line-clamp-3">{article.description}</p>
+        <p className="mt-2 text-base text-gray-600 line-clamp-3">{decodedDescription}</p>
         <div className="flex-grow"></div>
         <div className="mt-4">
           <a

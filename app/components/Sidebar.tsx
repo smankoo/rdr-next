@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, ChevronRight, ChevronDown } from "lucide-react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
-import { Collapsible, CollapsibleTrigger } from "@/app/components/ui/collapsible";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/app/components/ui/collapsible";
 import { Dialog, DialogTrigger } from "@/app/components/ui/dialog";
 import { Feed } from "@/app/types";
 import { useResizable } from "@/app/hooks/useResizable";
@@ -43,6 +43,7 @@ export function Sidebar({
   const [editingFeed, setEditingFeed] = useState<Feed | null>(null);
   const [editingFeedUrl, setEditingFeedUrl] = useState("");
   const [editingFeedName, setEditingFeedName] = useState("");
+  const [isAllFeedsOpen, setIsAllFeedsOpen] = useState(true);
 
   const handleOpenSettings = (feed: Feed) => {
     setEditingFeed(feed);
@@ -83,45 +84,53 @@ export function Sidebar({
       />
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
       <ScrollArea className="h-[calc(100vh-8rem)]">
-        <div
-          className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors ${
-            selectedFeedId === null ? "bg-gray-100 dark:bg-gray-500" : "hover:bg-gray-100 dark:hover:bg-gray-500"
-          }`}
-          onClick={() => setSelectedFeedId(null)}
-        >
-          <span className={`flex-grow truncate mr-2 ${selectedFeedId === null ? "font-semibold" : ""}`}>All Feeds</span>
-        </div>
-        {feeds.map((feed) => (
-          <Collapsible key={feed.id}>
-            <div
-              className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors group ${
-                selectedFeedId === feed.id ? "bg-gray-100 dark:bg-gray-500" : "hover:bg-gray-100 dark:hover:bg-gray-500"
-              }`}
-              onClick={() => setSelectedFeedId(feed.id)}
+        <Collapsible open={isAllFeedsOpen} onOpenChange={setIsAllFeedsOpen} className="space-y-2">
+          <div
+            className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors ${
+              selectedFeedId === null ? "bg-gray-100 dark:bg-gray-700" : "hover:bg-gray-100 dark:hover:bg-gray-700"
+            }`}
+          >
+            <span
+              className={`flex-grow truncate mr-2 ${selectedFeedId === null ? "font-semibold" : ""}`}
+              onClick={() => setSelectedFeedId(null)}
             >
-              <CollapsibleTrigger asChild>
+              All Feeds
+            </span>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-0 h-8 w-8 flex items-center justify-center">
+                {isAllFeedsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent className="ml-4 space-y-1">
+            {feeds.map((feed) => (
+              <div
+                key={feed.id}
+                className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors group ${
+                  selectedFeedId === feed.id
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setSelectedFeedId(feed.id)}
+              >
                 <span className={`flex-grow truncate mr-2 ${selectedFeedId === feed.id ? "font-semibold" : ""}`}>
                   {feed.name}
                 </span>
-              </CollapsibleTrigger>
-              <div className="flex items-center">
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors opacity-0 group-hover:opacity-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenSettings(feed);
-                    }}
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenSettings(feed);
+                  }}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
               </div>
-            </div>
-          </Collapsible>
-        ))}
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
       </ScrollArea>
       <Dialog open={isAddFeedOpen} onOpenChange={setIsAddFeedOpen}>
         <DialogTrigger asChild>
@@ -142,7 +151,7 @@ export function Sidebar({
         setIsOpen={setIsSettingsOpen}
         editingFeed={editingFeed}
         updateFeed={updateFeed}
-        deleteFeed={handleDeleteFeed} // Pass the handleDeleteFeed function here
+        deleteFeed={handleDeleteFeed}
       />
     </aside>
   );

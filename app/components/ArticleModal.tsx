@@ -4,6 +4,7 @@ import { formatDate } from "@/app/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from "isomorphic-dompurify";
 import { Switch } from "@headlessui/react";
+import { bypassPaywall } from "@/app/lib/bypassPaywall"; // You'll need to create this utility function
 
 interface ArticleModalProps {
   article: {
@@ -71,21 +72,32 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const fetchFullArticle = async () => {
     setIsLoading(true);
     try {
+      // First, try the original method
       const response = await fetch(`/api/fetchFullArticle?url=${encodeURIComponent(article.link)}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch full article");
+      if (response.ok) {
+        const data = await response.json();
+        setFullContent(data.content);
+      } else {
+        // If the original method fails, try bypassing the paywall
+        console.log("Original method failed, attempting to bypass paywall...");
+        const bypassedContent = await bypassPaywall(article.link);
+
+        if (bypassedContent) {
+          setFullContent(bypassedContent);
+        } else {
+          throw new Error("Failed to fetch full article");
+        }
       }
-      const data = await response.json();
-      setFullContent(data.content);
 
       // Compare first sentences
       const descriptionFirstSentence = getFirstSentence(article.description);
-      const contentFirstSentence = getFirstSentence(data.content);
+      const contentFirstSentence = getFirstSentence(fullContent || "");
 
       setShowDescription(descriptionFirstSentence !== contentFirstSentence);
     } catch (error) {
       console.error("Error fetching full article:", error);
-      // Optionally, show an error message to the user
+      // Show an error message to the user
+      setFullContent("Failed to load the full article. Please try again later.");
     } finally {
       setIsLoading(false);
     }

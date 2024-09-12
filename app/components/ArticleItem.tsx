@@ -1,6 +1,6 @@
 import React from "react";
 import { Article } from "@/app/types";
-import { timeAgo } from "@/app/lib/utils";
+import { timeAgo, calculateReadingTime } from "@/app/lib/utils";
 
 interface ArticleItemProps {
   article: Article;
@@ -9,6 +9,8 @@ interface ArticleItemProps {
 }
 
 export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProps) {
+  const readingTime = calculateReadingTime(article.description);
+
   return (
     <div className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default">
       {article.imageUrl && (
@@ -31,6 +33,8 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
           <span className="font-semibold text-indigo-600">{feedName}</span>
           <span className="mx-2 text-gray-300">•</span>
           <span>{timeAgo(article.pubDate)}</span>
+          <span className="mx-2 text-gray-300">•</span>
+          <span>{readingTime}</span>
           <span className="mx-2 text-gray-300">•</span>
           {article.isRead ? (
             <>

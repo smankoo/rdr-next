@@ -26,6 +26,8 @@ export function HomePage() {
   useEffect(() => {
     if (selectedFeedId) {
       fetchArticlesForFeed(selectedFeedId);
+    } else {
+      fetchAllArticles();
     }
   }, [selectedFeedId]);
 
@@ -82,7 +84,7 @@ export function HomePage() {
   const fetchAllArticles = async () => {
     setIsLoading(true);
     try {
-      const fetchedArticles = await fetchArticles();
+      const fetchedArticles = await fetchArticles(selectedFeedId || undefined);
       console.log("Fetched articles in home-page:", fetchedArticles);
       setArticles(fetchedArticles);
     } catch (error) {
@@ -107,8 +109,15 @@ export function HomePage() {
 
   const currentFeed = selectedFeedId ? feeds.find((feed) => feed.id === selectedFeedId) : null;
 
-  const currentFeedName = currentFeed?.name || "All Feeds";
-  const lastRefreshed = currentFeed?.lastRefreshed ? new Date(currentFeed.lastRefreshed) : null;
+  const currentFeedName = selectedFeedId
+    ? feeds.find((feed) => feed.id === selectedFeedId)?.name || "Unknown Feed"
+    : "All Feeds";
+
+  const lastRefreshed = selectedFeedId
+    ? feeds.find((feed) => feed.id === selectedFeedId)?.lastRefreshed
+      ? new Date(feeds.find((feed) => feed.id === selectedFeedId)!.lastRefreshed!)
+      : null
+    : null;
 
   const filterButtons = (
     <>
@@ -175,6 +184,14 @@ export function HomePage() {
     }
   };
 
+  const refreshArticles = async () => {
+    if (selectedFeedId) {
+      await fetchArticlesForFeed(selectedFeedId);
+    } else {
+      await fetchAllArticles();
+    }
+  };
+
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar
@@ -189,20 +206,19 @@ export function HomePage() {
         setNewFeedName={setNewFeedName}
         isAddFeedOpen={isAddFeedOpen}
         setIsAddFeedOpen={setIsAddFeedOpen}
-        setFeeds={setFeeds} // Add this line
-        updateFeed={updateFeed} // Add this line
+        updateFeed={updateFeed}
       />
       <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
         <Header
           feedName={currentFeedName}
           filterButtons={filterButtons}
           lastRefreshed={lastRefreshed}
-          fetchAllArticles={fetchAllArticles}
+          refreshArticles={refreshArticles}
         />
         <ArticleList
           articles={filteredArticles()}
           isLoading={isLoading}
-          feeds={feeds} // Add this line
+          feeds={feeds}
           markArticleAsRead={markArticleAsRead}
           fetchAllArticles={fetchAllArticles}
         />

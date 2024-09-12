@@ -10,22 +10,18 @@ interface HeaderProps {
   feedName: string;
   filterButtons: React.ReactNode;
   lastRefreshed: Date | null; // Change this to allow null
-  fetchAllArticles: () => Promise<void>;
+  refreshArticles: () => Promise<void>;
 }
 
-export function Header({ feedName, filterButtons, lastRefreshed, fetchAllArticles }: HeaderProps) {
+export function Header({ feedName, filterButtons, lastRefreshed, refreshArticles }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const response = await fetch("/api/feeds/refresh", { method: "POST" });
-      if (!response.ok) {
-        throw new Error("Failed to refresh feeds");
-      }
-      await fetchAllArticles();
+      await refreshArticles();
     } catch (error) {
-      console.error("Error refreshing feeds:", error);
+      console.error("Error refreshing articles:", error);
       // You might want to show an error message to the user here
     } finally {
       setIsRefreshing(false);

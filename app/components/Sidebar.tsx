@@ -83,6 +83,14 @@ export function Sidebar({
       />
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
       <ScrollArea className="h-[calc(100vh-8rem)]">
+        <div
+          className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors ${
+            selectedFeedId === null ? "bg-gray-100 dark:bg-gray-500" : "hover:bg-gray-100 dark:hover:bg-gray-500"
+          }`}
+          onClick={() => setSelectedFeedId(null)}
+        >
+          <span className={`flex-grow truncate mr-2 ${selectedFeedId === null ? "font-semibold" : ""}`}>All Feeds</span>
+        </div>
         {feeds.map((feed) => (
           <Collapsible key={feed.id}>
             <div

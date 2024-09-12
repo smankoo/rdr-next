@@ -156,104 +156,134 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     ? "font-serif text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-900"
     : "";
 
-  const contentClasses = `prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md ${
+  const contentClasses = `prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md md:columns-2 md:gap-8 columns-1 gap-0 ${
     isNewspaperMode
       ? "prose-h1:font-serif prose-h2:font-serif prose-h3:font-serif prose-p:text-justify prose-p:hyphens-auto"
       : ""
   }`;
 
   const descriptionSentences = getNumberOfSentences(article.description);
-  const shouldUseColumns = isNewspaperMode && descriptionSentences > 2;
+  const shouldUseColumns = descriptionSentences > 2;
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+  };
+
+  const contentVariants = {
+    hidden: { opacity: 0, height: 0 },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.7, // Increased from 0.5 to 0.7
+        ease: "easeInOut", // Added easing function for smoother animation
+      },
+    },
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <motion.div
         ref={modalRef}
         className={`bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl ${newspaperModeClasses}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
+        variants={modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
       >
+        <button
+          onClick={onClose}
+          className="md:hidden absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 transition-colors rounded-full bg-white bg-opacity-70 hover:bg-opacity-100 dark:bg-gray-800 dark:bg-opacity-70 dark:hover:bg-opacity-100 z-10"
+          aria-label="Close"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         <div className="p-8">
-          <div className="flex justify-between items-start mb-6">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight pr-8">
-              {article.title}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-              aria-label="Close"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+          <div className="flex flex-col md:flex-row justify-between items-start mb-4">
+            <div className="flex-1 pr-4">
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className={`text-3xl sm:text-4xl font-bold leading-tight tracking-tight mb-6 ${
+                  isNewspaperMode
+                    ? "font-serif text-gray-900 dark:text-gray-100"
+                    : "font-sans bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                }`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
-          {article.imageUrl && (
-            <div className="mb-6 relative aspect-w-16 aspect-h-9">
-              {!imageLoaded && (
-                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
-              )}
-              <Image
-                src={article.imageUrl}
-                alt={article.title}
-                layout="fill"
-                objectFit="cover"
-                className={`rounded-lg shadow-md ${
-                  imageLoaded ? "opacity-100" : "opacity-0"
-                } transition-opacity duration-300`}
-                placeholder="blur"
-                blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(1200, 675))}`}
-                onLoadingComplete={() => setImageLoaded(true)}
-              />
+                {article.title}
+              </motion.h2>
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
+                {article.author && (
+                  <span className="mr-4 flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    {article.author}
+                  </span>
+                )}
+                <span className="flex items-center">
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {formatDate(article.pubDate)}
+                </span>
+              </div>
             </div>
-          )}
-          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-6">
-            {article.author && (
-              <span className="mr-4 flex items-center">
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            {article.imageUrl && (
+              <div className="w-full md:w-1/3 mb-4 md:mb-0">
+                <div className="relative aspect-w-16 aspect-h-9">
+                  {!imageLoaded && (
+                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                  )}
+                  <Image
+                    src={article.imageUrl}
+                    alt={article.title}
+                    layout="fill"
+                    objectFit="cover"
+                    className={`rounded-lg shadow-md ${
+                      imageLoaded ? "opacity-100" : "opacity-0"
+                    } transition-opacity duration-300`}
+                    placeholder="blur"
+                    blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(1200, 675))}`}
+                    onLoadingComplete={() => setImageLoaded(true)}
                   />
-                </svg>
-                {article.author}
-              </span>
+                </div>
+              </div>
             )}
-            <span className="flex items-center">
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              {formatDate(article.pubDate)}
-            </span>
           </div>
+          <div className="border-b border-gray-200 dark:border-gray-700 mb-4"></div>
 
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
@@ -274,27 +304,33 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             </div>
           </div>
 
-          {/* Description - now with conditional column layout */}
-          {(showDescription || !fullContent) && (
-            <div
-              className={`${contentClasses} ${shouldUseColumns ? "columns-2 gap-8" : ""}`}
-              dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(article.description, true) }}
-            />
-          )}
-
-          {/* Animated full content */}
-          <AnimatePresence>
-            {fullContent && (
+          <AnimatePresence mode="wait">
+            {!fullContent ? (
+              <motion.div key="description" initial="hidden" animate="visible" exit="hidden" variants={contentVariants}>
+                <div
+                  className={`${contentClasses} ${shouldUseColumns ? "" : "!columns-1 !md:columns-1"}`}
+                  dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(article.description, true) }}
+                />
+              </motion.div>
+            ) : (
               <motion.div
                 key="full-content"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={contentVariants}
               >
-                {showDescription && <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />}
+                {showDescription && (
+                  <>
+                    <div
+                      className={`${contentClasses} ${shouldUseColumns ? "" : "!columns-1 !md:columns-1"}`}
+                      dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(article.description, true) }}
+                    />
+                    <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
+                  </>
+                )}
                 <div
-                  className={`${contentClasses} ${isNewspaperMode ? "columns-2 gap-8" : ""}`}
+                  className={contentClasses}
                   dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent, !showDescription) }}
                 />
                 <div className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">

@@ -4,7 +4,6 @@ import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger } from "@/app/components/ui/collapsible";
 import { Dialog, DialogTrigger } from "@/app/components/ui/dialog";
-import { Input } from "@/app/components/ui/input";
 import { Feed } from "@/app/types";
 import { useResizable } from "@/app/hooks/useResizable";
 import { AddFeedModal } from "./AddFeedModal";
@@ -13,7 +12,7 @@ import { FeedSettingsModal } from "./FeedSettingsModal";
 interface SidebarProps {
   feeds: Feed[];
   selectedFeedId: string | null;
-  setSelectedFeedId: (id: string) => void;
+  setSelectedFeedId: (id: string | null) => void;
   deleteFeed: (id: string) => void;
   addFeed: (url: string, name: string) => Promise<void>;
   newFeedUrl: string;

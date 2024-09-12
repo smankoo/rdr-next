@@ -10,6 +10,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const article = await extract(url);
+    if (!article) {
+      return NextResponse.json({ error: "Failed to extract article" }, { status: 500 });
+    }
     return NextResponse.json({ content: article.content });
   } catch (error) {
     console.error("Error extracting article:", error);

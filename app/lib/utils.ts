@@ -33,9 +33,9 @@ export function timeAgo(date: Date | string): string {
   }
 }
 
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
+export function formatDate(date: Date | string): string {
+  const dateObject = date instanceof Date ? date : new Date(date);
+  return dateObject.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",

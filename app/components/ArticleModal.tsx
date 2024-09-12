@@ -109,7 +109,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     // Add classes to headings for proper styling and animation
     doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading, index) => {
       heading.classList.add("font-bold", "mt-8", "mb-4", "animate-fade-in");
-      heading.style.animationDelay = `${index * 0.1}s`;
+      (heading as HTMLElement).style.animationDelay = `${index * 0.1}s`;
     });
 
     // Style blockquotes

@@ -2,6 +2,7 @@ export interface Feed {
   id: string;
   name: string;
   url: string;
+  lastRefreshed?: string; // Add this line
   articles: Article[];
 }
 

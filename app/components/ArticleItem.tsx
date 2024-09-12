@@ -9,8 +9,8 @@ interface ArticleItemProps {
 }
 
 export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProps) {
-  const readingTime = calculateReadingTime(article.description);
-  const decodedDescription = article.description ? decodeHTMLEntities(article.description) : "";
+  const readingTime = calculateReadingTime(article.description ?? "");
+  const decodedDescription = decodeHTMLEntities(article.description ?? "");
 
   return (
     <div className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default">

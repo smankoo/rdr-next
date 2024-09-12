@@ -85,19 +85,21 @@ export function Sidebar({
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
       <ScrollArea className="h-[calc(100vh-8rem)]">
         <Collapsible open={isAllFeedsOpen} onOpenChange={setIsAllFeedsOpen} className="space-y-2">
-          <div
-            className={`flex items-center justify-between w-full p-2 rounded-md cursor-pointer transition-colors ${
-              selectedFeedId === null ? "bg-gray-100 dark:bg-gray-700" : "hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
-          >
-            <span
-              className={`flex-grow truncate mr-2 ${selectedFeedId === null ? "font-semibold" : ""}`}
+          <div className="flex items-center w-full h-10 rounded-md overflow-hidden">
+            <div
+              className={`flex-grow h-full flex items-center px-3 cursor-pointer transition-colors ${
+                selectedFeedId === null ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-secondary/80"
+              }`}
               onClick={() => setSelectedFeedId(null)}
             >
-              All Feeds
-            </span>
+              <span className={`truncate ${selectedFeedId === null ? "font-semibold" : ""}`}>All Feeds</span>
+            </div>
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-0 h-8 w-8 flex items-center justify-center">
+              <Button
+                variant={isAllFeedsOpen ? "default" : "secondary"}
+                size="icon"
+                className="h-full w-10 rounded-none"
+              >
                 {isAllFeedsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>

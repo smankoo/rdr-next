@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { formatDate } from "@/app/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ArticleModalProps {
   article: {
@@ -165,10 +166,20 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
               {formatDate(article.pubDate)}
             </span>
           </div>
-          <div
-            className="prose prose-lg max-w-none dark:prose-invert mb-8"
-            dangerouslySetInnerHTML={{ __html: fullContent || article.description }}
-          />
+          <AnimatePresence>
+            <motion.div
+              key={fullContent ? "full" : "summary"}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
+              <div
+                className="prose prose-lg max-w-none dark:prose-invert mb-8"
+                dangerouslySetInnerHTML={{ __html: fullContent || article.description }}
+              />
+            </motion.div>
+          </AnimatePresence>
           <div className="mt-8 border-t pt-6 dark:border-gray-700">
             {!fullContent && (
               <button

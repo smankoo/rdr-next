@@ -100,14 +100,34 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(sanitizedContent, "text/html");
 
-    // Add classes to paragraphs for better spacing
-    doc.querySelectorAll("p").forEach((p) => {
-      p.classList.add("mb-4");
+    // Add classes to paragraphs for better spacing and animation
+    doc.querySelectorAll("p").forEach((p, index) => {
+      p.classList.add("mb-4", "animate-fade-in");
+      p.style.animationDelay = `${index * 0.1}s`;
     });
 
-    // Add classes to headings for proper styling
-    doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
-      heading.classList.add("font-bold", "mt-6", "mb-4");
+    // Add classes to headings for proper styling and animation
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading, index) => {
+      heading.classList.add("font-bold", "mt-8", "mb-4", "animate-fade-in");
+      heading.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // Style blockquotes
+    doc.querySelectorAll("blockquote").forEach((quote) => {
+      quote.classList.add(
+        "border-l-4",
+        "border-blue-500",
+        "pl-4",
+        "italic",
+        "my-4",
+        "text-gray-600",
+        "dark:text-gray-400"
+      );
+    });
+
+    // Style links
+    doc.querySelectorAll("a").forEach((link) => {
+      link.classList.add("text-blue-600", "hover:text-blue-800", "transition-colors");
     });
 
     return doc.body.innerHTML;
@@ -115,9 +135,13 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div
+      <motion.div
         ref={modalRef}
         className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
       >
         <div className="p-8">
           <div className="flex justify-between items-start mb-6">
@@ -212,14 +236,14 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             {fullContent && (
               <motion.div
                 key="full-content"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
                 {showDescription && <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />}
                 <div
-                  className="prose prose-lg max-w-none dark:prose-invert mb-8"
+                  className="prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md"
                   dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}
                 />
                 <div className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">
@@ -316,7 +340,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             </a>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

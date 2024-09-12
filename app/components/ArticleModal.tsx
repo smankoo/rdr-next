@@ -200,7 +200,6 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
               {fullContent && (
                 <>
                   <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">Full article content:</div>
                   <div
                     className="prose prose-lg max-w-none dark:prose-invert mb-8"
                     dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}
@@ -213,9 +212,9 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 transition-colors"
                     >
-                      the original source
+                      {new URL(article.link).hostname}
                     </a>
-                    . Please visit the source for the most up-to-date version and to support the author's work.
+                    .
                   </div>
                 </>
               )}

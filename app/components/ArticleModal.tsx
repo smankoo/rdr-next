@@ -185,40 +185,42 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
               {formatDate(article.pubDate)}
             </span>
           </div>
+
+          {/* Original description - not animated */}
+          <div
+            className="prose prose-lg max-w-none dark:prose-invert mb-8"
+            dangerouslySetInnerHTML={{ __html: article.description }}
+          />
+
+          {/* Animated full content */}
           <AnimatePresence>
-            <motion.div
-              key={fullContent ? "full" : "summary"}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-            >
-              <div
-                className="prose prose-lg max-w-none dark:prose-invert mb-8"
-                dangerouslySetInnerHTML={{ __html: article.description }}
-              />
-              {fullContent && (
-                <>
-                  <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
-                  <div
-                    className="prose prose-lg max-w-none dark:prose-invert mb-8"
-                    dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}
-                  />
-                  <div className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">
-                    This article was originally published by {article.author || "the author"} on{" "}
-                    <a
-                      href={article.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                      {new URL(article.link).hostname}
-                    </a>
-                    .
-                  </div>
-                </>
-              )}
-            </motion.div>
+            {fullContent && (
+              <motion.div
+                key="full-content"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              >
+                <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
+                <div
+                  className="prose prose-lg max-w-none dark:prose-invert mb-8"
+                  dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}
+                />
+                <div className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">
+                  This article was originally published by {article.author || "the author"} on{" "}
+                  <a
+                    href={article.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    {new URL(article.link).hostname}
+                  </a>
+                  .
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
 
           <div className="mt-8 flex justify-between items-center">

@@ -39,6 +39,8 @@ const toBase64 = (str: string) =>
 const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [fullContent, setFullContent] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,6 +62,23 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
+
+  const fetchFullArticle = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/fetchFullArticle?url=${encodeURIComponent(article.link)}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch full article");
+      }
+      const data = await response.json();
+      setFullContent(data.content);
+    } catch (error) {
+      console.error("Error fetching full article:", error);
+      // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -148,8 +167,33 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
           </div>
           <div
             className="prose prose-lg max-w-none dark:prose-invert mb-8"
-            dangerouslySetInnerHTML={{ __html: article.description }}
+            dangerouslySetInnerHTML={{ __html: fullContent || article.description }}
           />
+          <div className="mt-8 border-t pt-6 dark:border-gray-700">
+            {!fullContent && (
+              <button
+                onClick={fetchFullArticle}
+                disabled={isLoading}
+                className="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+              >
+                {isLoading ? "Fetching..." : "Fetch full article"}
+                <svg
+                  className="ml-2 w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
           <div className="mt-8 border-t pt-6 dark:border-gray-700">
             <a
               href={article.link}

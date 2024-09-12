@@ -7,19 +7,13 @@ interface ArticleListProps {
   articles: Article[];
   isLoading: boolean;
   feeds: Feed[];
-  markArticleAsRead: (articleId: string, isRead: boolean) => void;
+  markArticleAsRead: (articleId: string, isRead?: boolean) => void;
   fetchAllArticles: () => void;
 }
 
 const ARTICLES_PER_PAGE = 10;
 
-const ArticleList: React.FC<ArticleListProps> = ({
-  articles,
-  isLoading,
-  feeds,
-  markArticleAsRead,
-  fetchAllArticles,
-}) => {
+const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, markArticleAsRead }) => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [displayedArticles, setDisplayedArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);

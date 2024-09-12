@@ -1,6 +1,7 @@
 import React from "react";
 import { Article } from "@/app/types";
 import { timeAgo, calculateReadingTime, decodeHTMLEntities } from "@/app/lib/utils";
+import Image from "next/image";
 
 interface ArticleItemProps {
   article: Article;
@@ -16,9 +17,11 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
     <div className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default">
       {article.imageUrl && (
         <div className="article-image-container w-48 h-48 flex-shrink-0 overflow-hidden rounded-lg">
-          <img
+          <Image
             src={article.imageUrl}
             alt={article.title}
+            width={192}
+            height={192}
             className="article-image w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>

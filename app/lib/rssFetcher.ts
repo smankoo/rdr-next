@@ -1,5 +1,3 @@
-import type { ParsedUrlQuery } from "querystring";
-
 export interface FeedItem {
   title: string;
   description?: string; // Add this line

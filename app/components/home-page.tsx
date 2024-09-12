@@ -153,8 +153,7 @@ export function HomePage() {
     }
   };
 
-  const markArticleAsRead = async (articleId: string) => {
-    const isRead = true;
+  const markArticleAsRead = async (articleId: string, isRead: boolean = true) => {
     try {
       const response = await fetch(`/api/articles/${articleId}/read`, {
         method: "PATCH",

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, ChevronRight, Settings, X } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger } from "@/app/components/ui/collapsible";
@@ -21,7 +21,6 @@ interface SidebarProps {
   setNewFeedName: (name: string) => void;
   isAddFeedOpen: boolean;
   setIsAddFeedOpen: (isOpen: boolean) => void;
-  setFeeds: React.Dispatch<React.SetStateAction<Feed[]>>;
   updateFeed: (id: string, url: string, name: string) => Promise<void>;
 }
 
@@ -37,11 +36,9 @@ export function Sidebar({
   setNewFeedName,
   isAddFeedOpen,
   setIsAddFeedOpen,
-  setFeeds,
   updateFeed,
 }: SidebarProps) {
   const { width, startResizing } = useResizable(256, 200, 400);
-  const [hoveredFeedId, setHoveredFeedId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingFeed, setEditingFeed] = useState<Feed | null>(null);
   const [editingFeedUrl, setEditingFeedUrl] = useState("");
@@ -52,21 +49,6 @@ export function Sidebar({
     setEditingFeedUrl(feed.url);
     setEditingFeedName(feed.name);
     setIsSettingsOpen(true);
-  };
-
-  const handleUpdateFeed = () => {
-    if (editingFeed) {
-      updateFeed(editingFeed.id, editingFeedUrl, editingFeedName);
-      setIsSettingsOpen(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleUpdateFeed();
-    } else if (e.key === "Escape") {
-      setIsSettingsOpen(false);
-    }
   };
 
   const handleDeleteFeed = async (feedId: string) => {

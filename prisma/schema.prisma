@@ -19,6 +19,7 @@ model Feed {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   articles      Article[]
+  tags          Tag[]    @relation("FeedToTag")
 }
 
 model Article {
@@ -36,4 +37,10 @@ model Article {
   isRead      Boolean  @default(false)
 
   @@unique([feedId, link])
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  feeds     Feed[]   @relation("FeedToTag")
 }

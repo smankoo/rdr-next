@@ -140,13 +140,7 @@ export function Sidebar({
             <Plus className="mr-2 h-4 w-4" /> Add Feed
           </Button>
         </DialogTrigger>
-        <AddFeedModal
-          newFeedUrl={newFeedUrl}
-          setNewFeedUrl={setNewFeedUrl}
-          newFeedName={newFeedName}
-          setNewFeedName={setNewFeedName}
-          addFeed={addFeed}
-        />
+        <AddFeedModal isOpen={isAddFeedOpen} setIsOpen={setIsAddFeedOpen} addFeed={addFeed} />
       </Dialog>
       <FeedSettingsModal
         isOpen={isSettingsOpen}

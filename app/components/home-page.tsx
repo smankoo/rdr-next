@@ -52,11 +52,9 @@ export function HomePage() {
       if (!response.ok) throw new Error("Failed to add feed");
       const newFeed = await response.json();
       setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
-      setNewFeedUrl("");
-      setNewFeedName("");
       setIsAddFeedOpen(false);
-      setSelectedFeedId(newFeed.id); // Set the new feed as the selected feed
-      fetchArticlesForFeed(newFeed.id); // Fetch articles for the new feed
+      setSelectedFeedId(newFeed.id);
+      fetchArticlesForFeed(newFeed.id);
     } catch (error) {
       console.error("Error adding feed:", error);
     }
@@ -228,5 +226,4 @@ export function HomePage() {
 
   console.log("Displayed articles:", displayedArticles);
 }
-
 export default HomePage;

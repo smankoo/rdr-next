@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { formatDate } from "@/app/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import DOMPurify from "isomorphic-dompurify";
 
 interface ArticleModalProps {
   article: {
@@ -79,6 +80,24 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const sanitizeAndFormatContent = (content: string) => {
+    const sanitizedContent = DOMPurify.sanitize(content);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(sanitizedContent, "text/html");
+
+    // Add classes to paragraphs for better spacing
+    doc.querySelectorAll("p").forEach((p) => {
+      p.classList.add("mb-4");
+    });
+
+    // Add classes to headings for proper styling
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
+      heading.classList.add("font-bold", "mt-6", "mb-4");
+    });
+
+    return doc.body.innerHTML;
   };
 
   return (
@@ -176,8 +195,30 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             >
               <div
                 className="prose prose-lg max-w-none dark:prose-invert mb-8"
-                dangerouslySetInnerHTML={{ __html: fullContent || article.description }}
+                dangerouslySetInnerHTML={{ __html: article.description }}
               />
+              {fullContent && (
+                <>
+                  <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">Full article content:</div>
+                  <div
+                    className="prose prose-lg max-w-none dark:prose-invert mb-8"
+                    dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}
+                  />
+                  <div className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">
+                    This article was originally published by {article.author || "the author"} on{" "}
+                    <a
+                      href={article.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      the original source
+                    </a>
+                    . Please visit the source for the most up-to-date version and to support the author's work.
+                  </div>
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
 

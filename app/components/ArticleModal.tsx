@@ -43,6 +43,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [fullContent, setFullContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDescription, setShowDescription] = useState(true);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,12 +75,24 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
       }
       const data = await response.json();
       setFullContent(data.content);
+
+      // Compare first sentences
+      const descriptionFirstSentence = getFirstSentence(article.description);
+      const contentFirstSentence = getFirstSentence(data.content);
+
+      setShowDescription(descriptionFirstSentence !== contentFirstSentence);
     } catch (error) {
       console.error("Error fetching full article:", error);
       // Optionally, show an error message to the user
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getFirstSentence = (text: string): string => {
+    const cleanText = text.replace(/<[^>]*>/g, ""); // Remove HTML tags
+    const match = cleanText.match(/^.*?[.!?](?:\s|$)/);
+    return match ? match[0].trim() : cleanText;
   };
 
   const sanitizeAndFormatContent = (content: string) => {
@@ -187,10 +200,12 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
           </div>
 
           {/* Original description - not animated */}
-          <div
-            className="prose prose-lg max-w-none dark:prose-invert mb-8"
-            dangerouslySetInnerHTML={{ __html: article.description }}
-          />
+          {(showDescription || !fullContent) && (
+            <div
+              className="prose prose-lg max-w-none dark:prose-invert mb-8"
+              dangerouslySetInnerHTML={{ __html: article.description }}
+            />
+          )}
 
           {/* Animated full content */}
           <AnimatePresence>
@@ -202,7 +217,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />
+                {showDescription && <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />}
                 <div
                   className="prose prose-lg max-w-none dark:prose-invert mb-8"
                   dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(fullContent) }}

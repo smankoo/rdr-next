@@ -69,6 +69,14 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     };
   }, [onClose]);
 
+  useEffect(() => {
+    if (fullContent) {
+      const descriptionFirstSentence = getFirstSentence(article.description);
+      const contentFirstSentence = getFirstSentence(fullContent);
+      setShowDescription(descriptionFirstSentence !== contentFirstSentence);
+    }
+  }, [fullContent, article.description]);
+
   const fetchFullArticle = async () => {
     setIsLoading(true);
     try {
@@ -88,12 +96,6 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
           throw new Error("Failed to fetch full article");
         }
       }
-
-      // Compare first sentences
-      const descriptionFirstSentence = getFirstSentence(article.description);
-      const contentFirstSentence = getFirstSentence(fullContent || "");
-
-      setShowDescription(descriptionFirstSentence !== contentFirstSentence);
     } catch (error) {
       console.error("Error fetching full article:", error);
       // Show an error message to the user
@@ -104,7 +106,15 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   };
 
   const getFirstSentence = (text: string): string => {
-    const cleanText = text.replace(/<[^>]*>/g, ""); // Remove HTML tags
+    // Remove all HTML tags, entities, and excessive whitespace
+    const cleanText = text
+      .replace(/<[^>]*>/g, "") // Remove HTML tags
+      .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+      .replace(/&[a-z]+;/g, "") // Remove other HTML entities
+      .replace(/\s+/g, " ") // Replace multiple spaces with single space
+      .trim();
+
+    // Extract the first sentence
     const match = cleanText.match(/^.*?[.!?](?:\s|$)/);
     return match ? match[0].trim() : cleanText;
   };
@@ -136,7 +146,8 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     ];
 
     doc.body.querySelectorAll("*").forEach((el) => {
-      if (el.textContent && unwantedTexts.some((text) => el.textContent.includes(text))) {
+      const textContent = el.textContent;
+      if (textContent && unwantedTexts.some((text) => textContent.includes(text))) {
         el.remove();
       }
     });
@@ -235,17 +246,14 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   };
 
   const newspaperModeClasses = isNewspaperMode
-    ? "font-serif text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-900"
-    : "";
+    ? "font-serif text-gray-900 dark:text-gray-100"
+    : "font-sans text-gray-800 dark:text-gray-200";
 
-  const contentClasses = `prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md md:columns-2 md:gap-8 columns-1 gap-0 ${
+  const contentClasses = `prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md ${
     isNewspaperMode
       ? "prose-h1:font-serif prose-h2:font-serif prose-h3:font-serif prose-p:text-justify prose-p:hyphens-auto"
-      : ""
+      : "prose-h1:font-sans prose-h2:font-sans prose-h3:font-sans"
   }`;
-
-  const descriptionSentences = getNumberOfSentences(article.description);
-  const shouldUseColumns = descriptionSentences > 2;
 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
@@ -268,7 +276,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <motion.div
         ref={modalRef}
-        className={`bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl ${newspaperModeClasses}`}
+        className={`rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl bg-white dark:bg-gray-800 ${newspaperModeClasses}`}
         variants={modalVariants}
         initial="hidden"
         animate="visible"
@@ -297,9 +305,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
                 className={`text-3xl sm:text-4xl font-bold leading-tight tracking-tight mb-6 ${
-                  isNewspaperMode
-                    ? "font-serif text-gray-900 dark:text-gray-100"
-                    : "font-sans bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                  isNewspaperMode ? "font-serif" : "font-sans"
                 }`}
               >
                 {article.title}
@@ -390,7 +396,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             {!fullContent ? (
               <motion.div key="description" initial="hidden" animate="visible" exit="hidden" variants={contentVariants}>
                 <div
-                  className={`${contentClasses} ${shouldUseColumns ? "" : "!columns-1 !md:columns-1"}`}
+                  className={contentClasses}
                   dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(article.description, true) }}
                 />
               </motion.div>
@@ -405,7 +411,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
                 {showDescription && (
                   <>
                     <div
-                      className={`${contentClasses} ${shouldUseColumns ? "" : "!columns-1 !md:columns-1"}`}
+                      className={contentClasses}
                       dangerouslySetInnerHTML={{ __html: sanitizeAndFormatContent(article.description, true) }}
                     />
                     <hr className="my-8 border-t border-gray-300 dark:border-gray-700" />

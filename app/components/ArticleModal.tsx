@@ -116,9 +116,40 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   };
 
   const sanitizeAndFormatContent = (content: string, isFirstParagraph: boolean) => {
-    const sanitizedContent = DOMPurify.sanitize(content);
+    const sanitizedContent = DOMPurify.sanitize(content, {
+      ADD_TAGS: ["iframe"],
+      ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "href", "target"],
+    });
     const parser = new DOMParser();
     const doc = parser.parseFromString(sanitizedContent, "text/html");
+
+    // Remove unwanted elements
+    const unwantedTexts = [
+      "Advertisement",
+      "SKIP ADVERTISEMENT",
+      "liveUpdates",
+      "Poll Tracker",
+      "Who Won the Debate?",
+      "Takeaways",
+      "Undecided Voters React",
+      "Key Issues",
+    ];
+
+    doc.body.querySelectorAll("*").forEach((el) => {
+      if (el.textContent && unwantedTexts.some((text) => el.textContent.includes(text))) {
+        el.remove();
+      }
+    });
+
+    // Remove elements with class 'live-blog-post'
+    doc.querySelectorAll(".live-blog-post").forEach((el) => el.remove());
+
+    // Remove empty paragraphs
+    doc.querySelectorAll("p").forEach((p) => {
+      if (p.textContent?.trim() === "") {
+        p.remove();
+      }
+    });
 
     // Add classes to paragraphs for better spacing and animation
     doc.querySelectorAll("p").forEach((p, index) => {
@@ -141,6 +172,17 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading, index) => {
       heading.classList.add("font-bold", "mt-8", "mb-4", "animate-fade-in");
       (heading as HTMLElement).style.animationDelay = `${index * 0.1}s`;
+
+      // Make headings more prominent
+      if (heading.tagName === "H1") {
+        heading.classList.add("text-3xl", "md:text-4xl");
+      } else if (heading.tagName === "H2") {
+        heading.classList.add("text-2xl", "md:text-3xl");
+      } else if (heading.tagName === "H3") {
+        heading.classList.add("text-xl", "md:text-2xl");
+      } else {
+        heading.classList.add("text-lg", "md:text-xl");
+      }
     });
 
     // Style blockquotes
@@ -159,6 +201,34 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     // Style links
     doc.querySelectorAll("a").forEach((link) => {
       link.classList.add("text-blue-600", "hover:text-blue-800", "transition-colors");
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener noreferrer");
+    });
+
+    // Style images
+    doc.querySelectorAll("img").forEach((img) => {
+      img.classList.add("rounded-lg", "shadow-md", "my-4");
+    });
+
+    // Style lists
+    doc.querySelectorAll("ul, ol").forEach((list) => {
+      list.classList.add("my-4", "ml-6");
+    });
+    doc.querySelectorAll("li").forEach((item) => {
+      item.classList.add("mb-2");
+    });
+
+    // Style tables
+    doc.querySelectorAll("table").forEach((table) => {
+      table.classList.add("w-full", "border-collapse", "my-4");
+    });
+    doc.querySelectorAll("th, td").forEach((cell) => {
+      cell.classList.add("border", "border-gray-300", "dark:border-gray-700", "p-2");
+    });
+
+    // Style iframes (e.g., for embedded videos)
+    doc.querySelectorAll("iframe").forEach((iframe) => {
+      iframe.classList.add("w-full", "aspect-video", "my-4");
     });
 
     return doc.body.innerHTML;

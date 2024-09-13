@@ -7,8 +7,11 @@ import { Header } from "@/app/components/Header";
 import ArticleList from "@/app/components/ArticleList";
 import { Feed, Article } from "@/app/types";
 import { fetchArticles } from "@/app/lib/feedUtils";
+import { useTheme } from "../contexts/ThemeContext";
 
 export function HomePage() {
+  const { theme } = useTheme();
+
   const [activeFilter, setActiveFilter] = useState<"All Articles" | "Unread">("All Articles");
   const [feeds, setFeeds] = useState<Feed[]>([]);
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
@@ -190,8 +193,10 @@ export function HomePage() {
     }
   };
 
+  const themeClasses = theme === "newspaper" ? "font-serif" : "font-sans";
+
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+    <div className={`flex h-screen ${themeClasses}`}>
       <Sidebar
         feeds={feeds}
         selectedFeedId={selectedFeedId}
@@ -206,7 +211,7 @@ export function HomePage() {
         setIsAddFeedOpen={setIsAddFeedOpen}
         updateFeed={updateFeed}
       />
-      <main className="flex-1 flex flex-col overflow-hidden border-l border-gray-200">
+      <main className="flex-1 flex flex-col overflow-hidden">
         <Header
           feedName={currentFeedName}
           filterButtons={filterButtons}
@@ -226,4 +231,5 @@ export function HomePage() {
 
   console.log("Displayed articles:", displayedArticles);
 }
+
 export default HomePage;

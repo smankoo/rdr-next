@@ -3,8 +3,8 @@ import Image from "next/image";
 import { formatDate } from "@/app/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from "isomorphic-dompurify";
-import { Switch } from "@headlessui/react";
 import { bypassPaywall } from "@/app/lib/bypassPaywall"; // You'll need to create this utility function
+import { useTheme } from "../contexts/ThemeContext";
 
 interface ArticleModalProps {
   article: {
@@ -46,7 +46,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   const [fullContent, setFullContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDescription, setShowDescription] = useState(true);
-  const [isNewspaperMode, setIsNewspaperMode] = useState(true);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -170,7 +170,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
 
     // Apply large first letter styling to the first paragraph
     const firstParagraph = doc.querySelector("p");
-    if (isNewspaperMode && firstParagraph && isFirstParagraph) {
+    if (theme === "newspaper" && firstParagraph && isFirstParagraph) {
       firstParagraph.classList.add(
         "first-letter:float-left",
         "first-letter:text-5xl",
@@ -203,8 +203,8 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
         "pl-4",
         "italic",
         "my-4",
-        isNewspaperMode ? "border-gray-800" : "border-blue-500",
-        isNewspaperMode ? "text-gray-800" : "text-gray-600",
+        theme === "newspaper" ? "border-gray-800" : "border-blue-500",
+        theme === "newspaper" ? "text-gray-800" : "text-gray-600",
         "dark:text-gray-400"
       );
     });
@@ -245,12 +245,13 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     return doc.body.innerHTML;
   };
 
-  const newspaperModeClasses = isNewspaperMode
-    ? "font-serif text-gray-900 dark:text-gray-100"
-    : "font-sans text-gray-800 dark:text-gray-200";
+  const themeClasses =
+    theme === "newspaper"
+      ? "font-serif text-gray-900 dark:text-gray-100"
+      : "font-sans text-gray-800 dark:text-gray-200";
 
   const contentClasses = `prose prose-lg max-w-none dark:prose-invert mb-8 prose-img:rounded-lg prose-img:shadow-md ${
-    isNewspaperMode
+    theme === "newspaper"
       ? "prose-h1:font-serif prose-h2:font-serif prose-h3:font-serif prose-p:text-justify prose-p:hyphens-auto"
       : "prose-h1:font-sans prose-h2:font-sans prose-h3:font-sans"
   }`;
@@ -276,7 +277,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <motion.div
         ref={modalRef}
-        className={`rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl bg-white dark:bg-gray-800 ${newspaperModeClasses}`}
+        className={`rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl bg-white dark:bg-gray-800 ${themeClasses}`}
         variants={modalVariants}
         initial="hidden"
         animate="visible"
@@ -305,7 +306,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
                 className={`text-3xl sm:text-4xl font-bold leading-tight tracking-tight mb-6 ${
-                  isNewspaperMode ? "font-serif" : "font-sans"
+                  theme === "newspaper" ? "font-serif" : "font-sans"
                 }`}
               >
                 {article.title}
@@ -372,25 +373,6 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
             )}
           </div>
           <div className="border-b border-gray-200 dark:border-gray-700 mb-4"></div>
-
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <span className="mr-3 text-sm font-medium text-gray-700 dark:text-gray-300">Newspaper Mode</span>
-              <Switch
-                checked={isNewspaperMode}
-                onChange={setIsNewspaperMode}
-                className={`${
-                  isNewspaperMode ? "bg-blue-600" : "bg-gray-200"
-                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-              >
-                <span
-                  className={`${
-                    isNewspaperMode ? "translate-x-6" : "translate-x-1"
-                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                />
-              </Switch>
-            </div>
-          </div>
 
           <AnimatePresence mode="wait">
             {!fullContent ? (

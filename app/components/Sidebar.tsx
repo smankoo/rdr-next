@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Settings, ChevronRight, ChevronDown } from "lucide-react";
+import { Plus, Settings, ChevronRight, ChevronDown, Sun, Moon } from "lucide-react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/app/components/ui/collapsible";
@@ -8,6 +8,7 @@ import { Feed } from "@/app/types";
 import { useResizable } from "@/app/hooks/useResizable";
 import { AddFeedModal } from "./AddFeedModal";
 import { FeedSettingsModal } from "./FeedSettingsModal";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface SidebarProps {
   feeds: Feed[];
@@ -44,6 +45,7 @@ export function Sidebar({
   const [editingFeedUrl, setEditingFeedUrl] = useState("");
   const [editingFeedName, setEditingFeedName] = useState("");
   const [isAllFeedsOpen, setIsAllFeedsOpen] = useState(true);
+  const { theme, setTheme } = useTheme();
 
   const handleOpenSettings = (feed: Feed) => {
     setEditingFeed(feed);
@@ -76,6 +78,10 @@ export function Sidebar({
     // as it should be handled by the parent component
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === "modern" ? "newspaper" : "modern");
+  };
+
   return (
     <aside className="p-4 hidden md:block relative" style={{ width: `${width}px` }}>
       <div
@@ -83,7 +89,9 @@ export function Sidebar({
         onMouseDown={startResizing}
       />
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
-      <ScrollArea className="h-[calc(100vh-8rem)]">
+      <ScrollArea className="h-[calc(100vh-16rem)]">
+        {" "}
+        {/* Adjusted height to accommodate theme selector */}
         <Collapsible open={isAllFeedsOpen} onOpenChange={setIsAllFeedsOpen} className="space-y-2">
           <div className="flex items-center w-full h-10 rounded-md overflow-hidden">
             <div
@@ -134,6 +142,15 @@ export function Sidebar({
           </CollapsibleContent>
         </Collapsible>
       </ScrollArea>
+
+      {/* Theme selector moved here, above the Add Feed button */}
+      <div className="mt-4 mb-4">
+        <Button onClick={toggleTheme} variant="outline" className="w-full justify-between">
+          <span>{theme === "modern" ? "Modern" : "Newspaper"}</span>
+          {theme === "modern" ? <Sun className="h-4 w-4 ml-2" /> : <Moon className="h-4 w-4 ml-2" />}
+        </Button>
+      </div>
+
       <Dialog open={isAddFeedOpen} onOpenChange={setIsAddFeedOpen}>
         <DialogTrigger asChild>
           <Button className="w-full mt-4" variant="default">

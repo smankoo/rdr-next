@@ -3,8 +3,7 @@ import Image from "next/image";
 import { formatDate } from "@/app/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from "isomorphic-dompurify";
-import { bypassPaywall } from "@/app/lib/bypassPaywall"; // You'll need to create this utility function
-import { useTheme } from "../contexts/ThemeContext";
+import { bypassPaywall } from "@/app/lib/bypassPaywall";
 
 interface ArticleModalProps {
   article: {
@@ -16,6 +15,7 @@ interface ArticleModalProps {
     link: string;
   };
   onClose: () => void;
+  theme: "modern" | "newspaper";
 }
 
 const shimmer = (w: number, h: number) => `
@@ -40,13 +40,12 @@ const shimmer = (w: number, h: number) => `
 const toBase64 = (str: string) =>
   typeof window === "undefined" ? Buffer.from(str).toString("base64") : window.btoa(str);
 
-const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
+const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, theme }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [fullContent, setFullContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDescription, setShowDescription] = useState(true);
-  const { theme } = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

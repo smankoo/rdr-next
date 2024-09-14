@@ -8,6 +8,7 @@ import { Feed, Article } from "@/app/types";
 import { fetchArticles, fetchFeeds, addFeed, deleteFeed, updateFeed } from "@/app/lib/feedUtils";
 import { useUserPreferences } from "../hooks/useUserPreferences";
 import dynamic from "next/dynamic";
+import ArticleModal from "@/app/components/ArticleModal";
 
 const FilterButtons = dynamic(() => import("@/app/components/FilterButtons").then((mod) => mod.FilterButtons), {
   ssr: false,
@@ -185,6 +186,7 @@ export function HomePage() {
           markArticleAsRead={handleMarkArticleAsRead}
           fetchAllArticles={loadArticles}
           displayMode={preferences.displayMode}
+          theme={preferences.theme} // Add this line
         />
       </main>
     </div>

@@ -11,11 +11,20 @@ interface ArticleListProps {
   markArticleAsRead: (articleId: string, isRead?: boolean) => void;
   fetchAllArticles: () => void;
   displayMode: "list" | "grid";
+  theme: "modern" | "newspaper"; // Add this line
 }
 
 const ARTICLES_PER_PAGE = 10;
 
-const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, markArticleAsRead, displayMode }) => {
+const ArticleList: React.FC<ArticleListProps> = ({
+  articles,
+  isLoading,
+  feeds,
+  markArticleAsRead,
+  fetchAllArticles,
+  displayMode,
+  theme,
+}) => {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [displayedArticles, setDisplayedArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -86,15 +95,9 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, m
       </div>
       {selectedArticle && (
         <ArticleModal
-          article={{
-            ...selectedArticle,
-            description: selectedArticle.description || "",
-            author: selectedArticle.author ?? undefined,
-            imageUrl: selectedArticle.imageUrl ?? undefined,
-          }}
-          onClose={() => {
-            setSelectedArticle(null);
-          }}
+          article={selectedArticle}
+          onClose={() => setSelectedArticle(null)}
+          theme={theme} // Add this line
         />
       )}
     </div>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-type Theme = "modern" | "newspaper";
+export type Theme = "modern" | "newspaper";
 
 interface ThemeContextType {
   theme: Theme;

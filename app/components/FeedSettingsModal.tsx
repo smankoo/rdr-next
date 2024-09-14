@@ -11,9 +11,9 @@ interface FeedSettingsModalProps {
 }
 
 export function FeedSettingsModal({ isOpen, setIsOpen, editingFeed, updateFeed, deleteFeed }: FeedSettingsModalProps) {
-  const handleUpdate = (url: string, name: string) => {
+  const handleUpdate = async (url: string, name: string) => {
     if (editingFeed) {
-      updateFeed(editingFeed.id, url, name);
+      await updateFeed(editingFeed.id, url, name);
     }
   };
 

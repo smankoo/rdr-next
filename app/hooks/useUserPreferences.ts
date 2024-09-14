@@ -16,7 +16,6 @@ const defaultPreferences: UserPreferences = {
 
 export function useUserPreferences(): [UserPreferences, (key: keyof UserPreferences, value: any) => void] {
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const loadPreferences = () => {
@@ -24,7 +23,6 @@ export function useUserPreferences(): [UserPreferences, (key: keyof UserPreferen
       if (storedPreferences) {
         setPreferences(JSON.parse(storedPreferences));
       }
-      setIsLoaded(true);
     };
 
     loadPreferences();
@@ -38,5 +36,5 @@ export function useUserPreferences(): [UserPreferences, (key: keyof UserPreferen
     });
   };
 
-  return [preferences, updatePreference, isLoaded];
+  return [preferences, updatePreference];
 }

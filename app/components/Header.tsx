@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Search, Settings, RefreshCw, List, Grid } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const DynamicGrid = dynamic(() => import("lucide-react").then((mod) => mod.Grid), { ssr: false });
+const DynamicList = dynamic(() => import("lucide-react").then((mod) => mod.List), { ssr: false });
+const DynamicRefreshCw = dynamic(() => import("lucide-react").then((mod) => mod.RefreshCw), { ssr: false });
+const DynamicSearch = dynamic(() => import("lucide-react").then((mod) => mod.Search), { ssr: false });
+const DynamicSettings = dynamic(() => import("lucide-react").then((mod) => mod.Settings), { ssr: false });
+
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { getPlaceholderImage } from "@/app/lib/imageUtils";
@@ -12,6 +19,9 @@ interface HeaderProps {
   handleRefreshFeeds: () => Promise<void>;
   displayMode: "list" | "grid";
   toggleDisplayMode: () => void;
+  handleSetActiveFilter: (filter: "All Articles" | "Unread") => void;
+  activeFilter: "All Articles" | "Unread";
+  setDisplayMode: (mode: "list" | "grid") => void;
 }
 
 export function Header({
@@ -21,6 +31,9 @@ export function Header({
   handleRefreshFeeds,
   displayMode,
   toggleDisplayMode,
+  handleSetActiveFilter,
+  activeFilter,
+  setDisplayMode,
 }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -55,12 +68,12 @@ export function Header({
         >
           {displayMode === "list" ? (
             <>
-              <Grid className="h-4 w-4 mr-2" />
+              <DynamicGrid className="h-4 w-4 mr-2" />
               <span>Grid</span>
             </>
           ) : (
             <>
-              <List className="h-4 w-4 mr-2" />
+              <DynamicList className="h-4 w-4 mr-2" />
               <span>List</span>
             </>
           )}
@@ -72,15 +85,15 @@ export function Header({
           className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
           disabled={isRefreshing}
         >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+          <DynamicRefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
           <span>Refresh</span>
         </Button>
         <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100">
-          <Search className="h-4 w-4 mr-2" />
+          <DynamicSearch className="h-4 w-4 mr-2" />
           <span>Search</span>
         </Button>
         <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100">
-          <Settings className="h-4 w-4 mr-2" />
+          <DynamicSettings className="h-4 w-4 mr-2" />
           <span>Settings</span>
         </Button>
         <Avatar className="h-9 w-9 ring-2 ring-indigo-200">

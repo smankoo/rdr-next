@@ -1,111 +1,57 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Button } from "@/app/components/ui/button";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Sidebar } from "@/app/components/Sidebar";
 import { Header } from "@/app/components/Header";
 import ArticleList from "@/app/components/ArticleList";
 import { Feed, Article } from "@/app/types";
-import { fetchArticles } from "@/app/lib/feedUtils";
+import { fetchArticles, fetchFeeds, addFeed, deleteFeed, updateFeed } from "@/app/lib/feedUtils";
 import { useTheme } from "../contexts/ThemeContext";
+import useLocalStorage from "@/app/hooks/useLocalStorage";
+import dynamic from "next/dynamic";
+
+const FilterButtons = dynamic(() => import("@/app/components/FilterButtons").then((mod) => mod.FilterButtons), {
+  ssr: false,
+});
 
 export function HomePage() {
   const { theme } = useTheme();
-
-  const [activeFilter, setActiveFilter] = useState<"All Articles" | "Unread">("All Articles");
   const [feeds, setFeeds] = useState<Feed[]>([]);
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayMode, setDisplayMode] = useLocalStorage<"list" | "grid">("displayMode", "list");
+  const [activeFilter, setActiveFilter] = useLocalStorage<"All Articles" | "Unread">("activeFilter", "All Articles");
   const [newFeedUrl, setNewFeedUrl] = useState("");
   const [newFeedName, setNewFeedName] = useState("");
   const [isAddFeedOpen, setIsAddFeedOpen] = useState(false);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(0);
-  const [displayMode, setDisplayMode] = useState<"list" | "grid">("list");
 
   useEffect(() => {
-    // Load saved preferences from localStorage
-    const savedFilter = localStorage.getItem("activeFilter") as "All Articles" | "Unread";
-    const savedDisplayMode = localStorage.getItem("displayMode") as "list" | "grid";
-
-    if (savedFilter) setActiveFilter(savedFilter);
-    if (savedDisplayMode) setDisplayMode(savedDisplayMode);
+    initializePage();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("activeFilter", activeFilter);
-  }, [activeFilter]);
-
-  useEffect(() => {
-    localStorage.setItem("displayMode", displayMode);
-  }, [displayMode]);
-
-  useEffect(() => {
-    fetchFeeds();
-    fetchAllArticles();
-  }, []);
-
-  useEffect(() => {
-    if (selectedFeedId) {
-      fetchArticlesForFeed(selectedFeedId);
-    } else {
-      fetchAllArticles();
-    }
+    loadArticles();
   }, [selectedFeedId]);
 
-  const fetchFeeds = async () => {
+  const initializePage = async () => {
+    await loadFeeds();
+    await loadArticles();
+  };
+
+  const loadFeeds = async () => {
     try {
-      const response = await fetch("/api/feeds");
-      if (!response.ok) throw new Error("Failed to fetch feeds");
-      const data = await response.json();
-      setFeeds(data);
+      const fetchedFeeds = await fetchFeeds();
+      setFeeds(fetchedFeeds);
     } catch (error) {
       console.error("Error fetching feeds:", error);
     }
   };
 
-  const addFeed = async (url: string, name: string) => {
-    try {
-      const response = await fetch("/api/feeds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, name }),
-      });
-      if (!response.ok) throw new Error("Failed to add feed");
-      const newFeed = await response.json();
-      setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
-      setIsAddFeedOpen(false);
-      setSelectedFeedId(newFeed.id);
-      fetchArticlesForFeed(newFeed.id);
-    } catch (error) {
-      console.error("Error adding feed:", error);
-    }
-  };
-
-  const deleteFeed = async (feedId: string) => {
-    try {
-      const response = await fetch(`/api/feeds/${feedId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete feed");
-      setFeeds((prevFeeds) => {
-        const updatedFeeds = prevFeeds.filter((feed) => feed.id !== feedId);
-        if (updatedFeeds.length === 0) {
-          setArticles([]);
-          setSelectedFeedId(null);
-        }
-        return updatedFeeds;
-      });
-    } catch (error) {
-      console.error("Error deleting feed:", error);
-    }
-  };
-
-  const fetchAllArticles = async () => {
+  const loadArticles = async () => {
     setIsLoading(true);
     try {
       const fetchedArticles = await fetchArticles(selectedFeedId || undefined);
-      console.log("Fetched articles in home-page:", fetchedArticles);
       setArticles(fetchedArticles);
     } catch (error) {
       console.error("Error fetching articles:", error);
@@ -114,81 +60,47 @@ export function HomePage() {
     }
   };
 
-  const fetchArticlesForFeed = async (feedId: string) => {
-    setIsLoading(true);
+  const handleAddFeed = async (url: string, name: string) => {
     try {
-      const fetchedArticles = await fetchArticles(feedId);
-      console.log(`Fetched articles for feed ${feedId}:`, fetchedArticles);
-      setArticles(fetchedArticles);
+      const newFeed = await addFeed(url, name);
+      setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
+      setSelectedFeedId(newFeed.id);
+      setNewFeedUrl("");
+      setNewFeedName("");
+      setIsAddFeedOpen(false);
+      await loadArticles();
     } catch (error) {
-      console.error("Error fetching articles for feed:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Error adding feed:", error);
     }
   };
 
-  const currentFeed = selectedFeedId ? feeds.find((feed) => feed.id === selectedFeedId) : null;
-
-  const currentFeedName = selectedFeedId
-    ? feeds.find((feed) => feed.id === selectedFeedId)?.name || "Unknown Feed"
-    : "All Feeds";
-
-  const lastRefreshed = selectedFeedId
-    ? feeds.find((feed) => feed.id === selectedFeedId)?.lastRefreshed
-      ? new Date(feeds.find((feed) => feed.id === selectedFeedId)!.lastRefreshed!)
-      : null
-    : null;
-
-  const filterButtons = (
-    <>
-      {["All Articles", "Unread"].map((filter) => (
-        <Button
-          key={filter}
-          variant={activeFilter === filter ? "default" : "outline"}
-          onClick={() => handleSetActiveFilter(filter as "All Articles" | "Unread")}
-        >
-          {filter}
-        </Button>
-      ))}
-    </>
-  );
-
-  const filteredArticles = useCallback(() => {
-    if (activeFilter === "Unread") {
-      return articles.filter((article) => !article.isRead);
-    }
-    return articles;
-  }, [articles, activeFilter]);
-
-  const displayedArticles = selectedFeedId ? articles : articles;
-
-  const updateFeed = async (id: string, url: string, name: string) => {
+  const handleDeleteFeed = async (feedId: string) => {
     try {
-      const response = await fetch(`/api/feeds/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url, name }),
-      });
-
-      if (response.ok) {
-        setFeeds((prevFeeds) => prevFeeds.map((feed) => (feed.id === id ? { ...feed, url, name } : feed)));
-      } else {
-        console.error("Failed to update feed");
+      await deleteFeed(feedId);
+      setFeeds((prevFeeds) => prevFeeds.filter((feed) => feed.id !== feedId));
+      if (feeds.length === 1) {
+        setArticles([]);
+        setSelectedFeedId(null);
       }
+    } catch (error) {
+      console.error("Error deleting feed:", error);
+    }
+  };
+
+  const handleUpdateFeed = async (id: string, url: string, name: string) => {
+    try {
+      await updateFeed(id, url, name);
+      setFeeds((prevFeeds) => prevFeeds.map((feed) => (feed.id === id ? { ...feed, url, name } : feed)));
     } catch (error) {
       console.error("Error updating feed:", error);
     }
   };
 
-  const markArticleAsRead = async (articleId: string, isRead: boolean = true) => {
+  const handleMarkArticleAsRead = async (articleId: string, isRead: boolean = true) => {
     try {
       const response = await fetch(`/api/articles/${articleId}/read`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isRead }),
       });
 
@@ -197,7 +109,7 @@ export function HomePage() {
           prevArticles.map((article) => (article.id === articleId ? { ...article, isRead } : article))
         );
       } else {
-        console.error("Failed to mark article as read");
+        throw new Error("Failed to mark article as read");
       }
     } catch (error) {
       console.error("Error marking article as read:", error);
@@ -206,65 +118,72 @@ export function HomePage() {
 
   const handleRefreshFeeds = async () => {
     try {
-      const response = await fetch("/api/feeds/refresh");
-      if (response.ok) {
-        console.log("Feeds refreshed successfully");
-      } else {
-        console.error("Failed to refresh feeds");
-      }
+      await fetch("/api/feeds/refresh");
+      await loadFeeds();
+      await loadArticles();
     } catch (error) {
       console.error("Error refreshing feeds:", error);
     }
   };
 
-  const themeClasses = theme === "newspaper" ? "font-serif" : "font-sans";
-
-  const toggleDisplayMode = () => {
+  const toggleDisplayMode = useCallback(() => {
     setDisplayMode((prevMode) => (prevMode === "list" ? "grid" : "list"));
-  };
+  }, [setDisplayMode]);
 
-  const handleSetActiveFilter = (filter: "All Articles" | "Unread") => {
-    setActiveFilter(filter);
-  };
+  const handleSetActiveFilter = (filter: "All Articles" | "Unread") => setActiveFilter(filter);
+
+  const filteredArticles = useCallback(() => {
+    return activeFilter === "Unread" ? articles.filter((article) => !article.isRead) : articles;
+  }, [articles, activeFilter]);
+
+  const currentFeed = selectedFeedId ? feeds.find((feed) => feed.id === selectedFeedId) : null;
+  const currentFeedName = currentFeed?.name || "All Feeds";
+  const lastRefreshed = currentFeed?.lastRefreshed ? new Date(currentFeed.lastRefreshed) : null;
+
+  const sidebarProps = useMemo(
+    () => ({
+      feeds,
+      selectedFeedId,
+      setSelectedFeedId,
+      deleteFeed: handleDeleteFeed,
+      addFeed: handleAddFeed,
+      updateFeed: handleUpdateFeed,
+      newFeedUrl,
+      setNewFeedUrl,
+      newFeedName,
+      setNewFeedName,
+      isAddFeedOpen,
+      setIsAddFeedOpen,
+    }),
+    [feeds, selectedFeedId, newFeedUrl, newFeedName, isAddFeedOpen]
+  );
 
   return (
     <div className={`flex h-screen ${theme === "newspaper" ? "font-serif" : "font-sans"}`}>
-      <Sidebar
-        feeds={feeds}
-        selectedFeedId={selectedFeedId}
-        setSelectedFeedId={setSelectedFeedId}
-        deleteFeed={deleteFeed}
-        addFeed={addFeed}
-        newFeedUrl={newFeedUrl}
-        setNewFeedUrl={setNewFeedUrl}
-        newFeedName={newFeedName}
-        setNewFeedName={setNewFeedName}
-        isAddFeedOpen={isAddFeedOpen}
-        setIsAddFeedOpen={setIsAddFeedOpen}
-        updateFeed={updateFeed}
-      />
+      <Sidebar {...sidebarProps} />
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header
           feedName={currentFeedName}
-          filterButtons={filterButtons}
           lastRefreshed={lastRefreshed}
           handleRefreshFeeds={handleRefreshFeeds}
           displayMode={displayMode}
           toggleDisplayMode={toggleDisplayMode}
+          handleSetActiveFilter={handleSetActiveFilter}
+          activeFilter={activeFilter}
+          setDisplayMode={setDisplayMode}
+          filterButtons={<FilterButtons activeFilter={activeFilter} handleSetActiveFilter={handleSetActiveFilter} />}
         />
         <ArticleList
           articles={filteredArticles()}
           isLoading={isLoading}
           feeds={feeds}
-          markArticleAsRead={markArticleAsRead}
-          fetchAllArticles={fetchAllArticles}
+          markArticleAsRead={handleMarkArticleAsRead}
+          fetchAllArticles={loadArticles}
           displayMode={displayMode}
         />
       </main>
     </div>
   );
-
-  console.log("Displayed articles:", displayedArticles);
 }
 
 export default HomePage;

@@ -62,7 +62,31 @@ export function Sidebar({
   theme,
   setTheme,
 }: SidebarProps) {
-  const { width, handleResize } = useResizable(250, 200, 400);
+  const defaultWidth = 250;
+  const minWidth = 200;
+  const maxWidth = 400;
+
+  // Use state to manage the width
+  const [width, setWidth] = useState(() => {
+    // Initialize width from localStorage or use default
+    const savedWidth = localStorage.getItem("sidebarWidth");
+    if (savedWidth) {
+      const parsedWidth = parseInt(savedWidth, 10);
+      if (!isNaN(parsedWidth) && parsedWidth >= minWidth && parsedWidth <= maxWidth) {
+        return parsedWidth;
+      }
+    }
+    return defaultWidth;
+  });
+
+  // Use the useResizable hook
+  const { handleResize } = useResizable(width, minWidth, maxWidth);
+
+  // Save the width to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("sidebarWidth", width.toString());
+  }, [width]);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingFeed, setEditingFeed] = useState<Feed | null>(null);
   const [editingFeedUrl, setEditingFeedUrl] = useState("");
@@ -106,11 +130,27 @@ export function Sidebar({
     setTheme(theme === "modern" ? "newspaper" : "modern");
   };
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    const newWidth = handleResize(e.clientX);
+    setWidth(newWidth);
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
   return (
     <aside className="p-4 hidden md:block relative select-none" style={{ width: `${width}px` }}>
       <div
         className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-300"
-        onMouseDown={handleResize}
+        onMouseDown={handleMouseDown}
       />
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
       <ScrollArea className="h-[calc(100vh-16rem)]">

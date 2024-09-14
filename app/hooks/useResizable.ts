@@ -1,20 +1,12 @@
-import { useState, useEffect } from "react";
+import { useCallback } from "react";
 
-export function useResizable(initialWidth: number, minWidth: number, maxWidth: number) {
-  const [width, setWidth] = useState(initialWidth);
+export function useResizable(currentWidth: number, minWidth: number, maxWidth: number) {
+  const handleResize = useCallback(
+    (clientX: number) => {
+      return Math.max(minWidth, Math.min(clientX, maxWidth));
+    },
+    [minWidth, maxWidth]
+  );
 
-  useEffect(() => {
-    const savedWidth = localStorage.getItem("sidebarWidth");
-    if (savedWidth) {
-      setWidth(Math.max(minWidth, Math.min(parseInt(savedWidth, 10), maxWidth)));
-    }
-  }, [minWidth, maxWidth]);
-
-  const handleResize = (newWidth: number) => {
-    const clampedWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-    setWidth(clampedWidth);
-    localStorage.setItem("sidebarWidth", clampedWidth.toString());
-  };
-
-  return { width, handleResize };
+  return { handleResize };
 }

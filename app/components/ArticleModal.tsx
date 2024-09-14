@@ -130,37 +130,38 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
       ADD_TAGS: ["iframe"],
       ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "href", "target"],
     });
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(sanitizedContent, "text/html");
 
-    // Remove unwanted elements
-    const unwantedTexts = [
-      "Advertisement",
-      "SKIP ADVERTISEMENT",
-      "liveUpdates",
-      "Poll Tracker",
-      "Who Won the Debate?",
-      "Takeaways",
-      "Undecided Voters React",
-      "Key Issues",
-    ];
+    // // Remove unwanted elements
+    // const unwantedTexts = [
+    //   "Advertisement",
+    //   "SKIP ADVERTISEMENT",
+    //   "liveUpdates",
+    //   "Poll Tracker",
+    //   "Who Won the Debate?",
+    //   "Takeaways",
+    //   "Undecided Voters React",
+    //   "Key Issues",
+    // ];
 
-    doc.body.querySelectorAll("*").forEach((el) => {
-      const textContent = el.textContent;
-      if (textContent && unwantedTexts.some((text) => textContent.includes(text))) {
-        el.remove();
-      }
-    });
+    // doc.body.querySelectorAll("*").forEach((el) => {
+    //   const textContent = el.textContent;
+    //   if (textContent && unwantedTexts.some((text) => textContent.includes(text))) {
+    //     el.remove();
+    //   }
+    // });
 
-    // Remove elements with class 'live-blog-post'
-    doc.querySelectorAll(".live-blog-post").forEach((el) => el.remove());
+    // // Remove elements with class 'live-blog-post'
+    // doc.querySelectorAll(".live-blog-post").forEach((el) => el.remove());
 
-    // Remove empty paragraphs
-    doc.querySelectorAll("p").forEach((p) => {
-      if (p.textContent?.trim() === "") {
-        p.remove();
-      }
-    });
+    // // Remove empty paragraphs
+    // doc.querySelectorAll("p").forEach((p) => {
+    //   if (p.textContent?.trim() === "") {
+    //     p.remove();
+    //   }
+    // });
 
     // Add classes to paragraphs for better spacing and animation
     doc.querySelectorAll("p").forEach((p, index) => {
@@ -217,9 +218,9 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     });
 
     // Style images
-    doc.querySelectorAll("img").forEach((img) => {
-      img.classList.add("rounded-lg", "shadow-md", "my-4");
-    });
+    // doc.querySelectorAll("img").forEach((img) => {
+    //   img.classList.add("rounded-lg", "shadow-md", "my-4");
+    // });
 
     // Style lists
     doc.querySelectorAll("ul, ol").forEach((list) => {

@@ -14,7 +14,10 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
   const decodedDescription = decodeHTMLEntities(article.description ?? "");
 
   return (
-    <div className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default">
+    <div
+      className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default"
+      onClick={onTitleClick}
+    >
       {article.imageUrl && (
         <div className="article-image-container w-48 h-48 flex-shrink-0 overflow-hidden rounded-lg">
           <Image
@@ -29,7 +32,7 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
       <div className="flex-1 flex flex-col">
         <h2
           className="text-xl font-bold text-gray-800 mb-3 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
-          onClick={onTitleClick}
+          // onClick={onTitleClick}
         >
           {article.title}
         </h2>

@@ -28,8 +28,15 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
         hover:shadow-lg hover:scale-[1.02]
         ${displayMode === "grid" ? "flex flex-col" : "flex"}
         ${article.isRead ? "opacity-75" : ""}
+        relative cursor-default select-none
       `}
+      onClick={onTitleClick}
     >
+      {!article.isRead && (
+        <div className="absolute top-0 right-0 mt-2 mr-2">
+          <span className="bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">New</span>
+        </div>
+      )}
       {article.imageUrl && (
         <div className={`${displayMode === "grid" ? "w-full h-48" : "w-1/4 h-auto"}`}>
           <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
@@ -39,22 +46,15 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
         <h2
           className={`text-xl font-bold mb-3 cursor-pointer transition-colors duration-200
             ${article.isRead ? "text-gray-500" : "text-gray-800 hover:text-indigo-600"}`}
-          onClick={onTitleClick}
         >
           {article.title}
         </h2>
-        <p className="text-sm text-gray-500 mb-3 flex items-center">
+        <p className="text-sm text-gray-500 mb-3 flex items-center flex-wrap">
           <span className="font-semibold text-indigo-600">{feedName}</span>
           <span className="mx-2 text-gray-300">•</span>
           <span>{timeAgo(article.pubDate)}</span>
           <span className="mx-2 text-gray-300">•</span>
           <span>{readingTime}</span>
-          <span className="mx-2 text-gray-300">•</span>
-          {article.isRead ? (
-            <span className="w-2 h-2 bg-gray-400 rounded-full mr-1 inline-block"></span>
-          ) : (
-            <span className="w-2 h-2 bg-green-500 rounded-full mr-1 inline-block"></span>
-          )}
         </p>
         <div
           className="mt-2 text-base text-gray-600 line-clamp-3 article-description [&_a]:text-indigo-600 [&_a]:hover:text-indigo-800 [&_a]:hover:underline"
@@ -66,7 +66,7 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
             href={article.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-all duration-300 ease-in-out group"
+            className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-all duration-300 ease-in-out group cursor-pointer select-auto"
             onClick={(e) => {
               e.stopPropagation();
             }}

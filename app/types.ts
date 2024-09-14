@@ -9,15 +9,11 @@ export interface Feed {
 export interface Article {
   id: string;
   title: string;
-  description: string | null;
-  content: string | null;
-  link: string;
+  description: string | null; // Allow null
   pubDate: Date;
-  author?: string | null;
-  categories?: string[] | null;
-  imageUrl?: string | null;
-  feedId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  author?: string;
+  imageUrl?: string;
+  link: string;
   isRead: boolean;
+  feedId: string;
 }

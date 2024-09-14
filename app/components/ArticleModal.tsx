@@ -4,16 +4,10 @@ import { formatDate } from "@/app/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from "isomorphic-dompurify";
 import { bypassPaywall } from "@/app/lib/bypassPaywall";
+import { Article } from "@/app/types"; // Import the Article type
 
 interface ArticleModalProps {
-  article: {
-    title: string;
-    description: string;
-    pubDate: Date;
-    author?: string;
-    imageUrl?: string;
-    link: string;
-  };
+  article: Article; // Use the Article type directly
   onClose: () => void;
   theme: "modern" | "newspaper";
 }
@@ -124,7 +118,9 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, theme }) 
     return sentences ? sentences.length : 0;
   };
 
-  const sanitizeAndFormatContent = (content: string, isFirstParagraph: boolean) => {
+  const sanitizeAndFormatContent = (content: string | null, isFirstParagraph: boolean) => {
+    if (!content) return ""; // Handle null content
+
     const sanitizedContent = DOMPurify.sanitize(content, {
       ADD_TAGS: ["iframe"],
       ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "href", "target"],
@@ -372,7 +368,7 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, theme }) 
                 exit="hidden"
                 variants={contentVariants}
               >
-                {showDescription && (
+                {showDescription && article.description && (
                   <>
                     <div
                       className={contentClasses}

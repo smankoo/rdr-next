@@ -23,29 +23,7 @@ export function HomePage() {
   const [newFeedName, setNewFeedName] = useState("");
   const [isAddFeedOpen, setIsAddFeedOpen] = useState(false);
 
-  useEffect(() => {
-    initializePage();
-  }, []);
-
-  useEffect(() => {
-    loadArticles();
-  }, [preferences.selectedFeedId]);
-
-  const initializePage = async () => {
-    await loadFeeds();
-    await loadArticles();
-  };
-
-  const loadFeeds = async () => {
-    try {
-      const fetchedFeeds = await fetchFeeds();
-      setFeeds(fetchedFeeds);
-    } catch (error) {
-      console.error("Error fetching feeds:", error);
-    }
-  };
-
-  const loadArticles = async () => {
+  const loadArticles = useCallback(async () => {
     setIsLoading(true);
     try {
       const fetchedArticles = await fetchArticles(preferences.selectedFeedId || undefined);
@@ -54,6 +32,28 @@ export function HomePage() {
       console.error("Error fetching articles:", error);
     } finally {
       setIsLoading(false);
+    }
+  }, [preferences.selectedFeedId]);
+
+  useEffect(() => {
+    const initializePage = async () => {
+      await loadFeeds();
+      await loadArticles();
+    };
+    initializePage();
+  }, [loadArticles]);
+
+  const initializePage = async () => {
+    await loadFeeds();
+    // Remove loadArticles from here, as it will be called by the effect above
+  };
+
+  const loadFeeds = async () => {
+    try {
+      const fetchedFeeds = await fetchFeeds();
+      setFeeds(fetchedFeeds);
+    } catch (error) {
+      console.error("Error fetching feeds:", error);
     }
   };
 
@@ -135,8 +135,15 @@ export function HomePage() {
   );
 
   const filteredArticles = useMemo(() => {
-    return preferences.activeFilter === "Unread" ? articles.filter((article) => !article.isRead) : articles;
-  }, [articles, preferences.activeFilter]);
+    let filtered = articles;
+    if (preferences.selectedFeedId) {
+      filtered = filtered.filter((article) => article.feedId === preferences.selectedFeedId);
+    }
+    if (preferences.activeFilter === "Unread") {
+      filtered = filtered.filter((article) => !article.isRead);
+    }
+    return filtered;
+  }, [articles, preferences.selectedFeedId, preferences.activeFilter]);
 
   const currentFeed = preferences.selectedFeedId ? feeds.find((feed) => feed.id === preferences.selectedFeedId) : null;
   const currentFeedName = currentFeed?.name || "All Feeds";

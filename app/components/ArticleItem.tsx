@@ -2,6 +2,7 @@ import React from "react";
 import { Article } from "@/app/types";
 import { timeAgo, calculateReadingTime, decodeHTMLEntities } from "@/app/lib/utils";
 import Image from "next/image";
+import DOMPurify from "dompurify";
 
 interface ArticleItemProps {
   article: Article;
@@ -12,6 +13,11 @@ interface ArticleItemProps {
 export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProps) {
   const readingTime = calculateReadingTime(article.description ?? "");
   const decodedDescription = decodeHTMLEntities(article.description ?? "");
+
+  // Create a sanitized version of the HTML
+  const sanitizedDescription = DOMPurify.sanitize(decodedDescription, {
+    ADD_ATTR: ["target", "rel"], // Allow target and rel attributes
+  });
 
   return (
     <div
@@ -55,7 +61,10 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
             </>
           )}
         </p>
-        <p className="mt-2 text-base text-gray-600 line-clamp-3">{decodedDescription}</p>
+        <div
+          className="mt-2 text-base text-gray-600 line-clamp-3 article-description [&_a]:text-indigo-600 [&_a]:hover:text-indigo-800 [&_a]:hover:underline"
+          dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+        />
         <div className="flex-grow"></div>
         <div className="mt-4">
           <a
@@ -85,3 +94,5 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
     </div>
   );
 }
+
+// Remove the ArticleItemStyles export

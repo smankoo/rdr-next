@@ -12,6 +12,12 @@ This project is a modern RSS Feed Reader built with Next.js, React, and Prisma. 
 - Responsive design with a sidebar for feed management and a main content area for articles
 - Real-time updates using Server-Sent Events (SSE)
 - Dark mode support
+- Modern and Newspaper themes
+- List and Grid view options for articles
+- Full article view with content extraction
+- Reading time estimation
+- Automatic feed refresh
+- Search functionality (coming soon)
 
 ## Tech Stack
 
@@ -21,8 +27,29 @@ This project is a modern RSS Feed Reader built with Next.js, React, and Prisma. 
 - Prisma (ORM)
 - SQLite (Database)
 - Tailwind CSS (Styling)
+- Shadcn UI (Component Library)
 
-## Project Structure
+## Getting Started for Users
+
+1. Clone the repository
+2. Install dependencies:
+   ```
+   bun install
+   ```
+3. Set up the database:
+   ```
+   bunx prisma migrate dev
+   ```
+4. Run the development server:
+   ```
+   bun run dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+6. Start adding your favorite RSS feeds using the "Add Feed" button in the sidebar
+
+## Developer Guide
+
+### Project Structure
 
 - `app/`: Next.js app directory
   - `api/`: API routes
@@ -32,7 +59,7 @@ This project is a modern RSS Feed Reader built with Next.js, React, and Prisma. 
 - `prisma/`: Prisma schema and migrations
 - `public/`: Static assets
 
-## Key Components
+### Key Components
 
 - `HomePage`: Main component that orchestrates the app's functionality
 - `Sidebar`: Manages feed list and feed operations
@@ -41,27 +68,34 @@ This project is a modern RSS Feed Reader built with Next.js, React, and Prisma. 
 - `ArticleItem`: Individual article display
 - `ArticleModal`: Modal for detailed article view
 
-## Setup and Installation
+### Adding New Features
 
-1. Clone the repository
-2. Install dependencies:
-   ```
-   npm install
-   ```
-3. Set up the database:
-   ```
-   npx prisma migrate dev
-   ```
-4. Run the development server:
-   ```
-   npm run dev
-   ```
+1. Create new components in the `app/components/` directory
+2. Add new API routes in the `app/api/` directory if needed
+3. Update the Prisma schema in `prisma/schema.prisma` for any database changes
+4. Implement new functionality in the `HomePage` component or create new page components as needed
+5. Update types in `app/types.ts` to reflect any new data structures
 
-## API Routes
+### Best Practices
 
-- `/api/feeds`: CRUD operations for feeds
-- `/api/articles`: Fetch articles
-- `/api/sse`: Server-Sent Events for real-time updates
+- Follow the principles of Clean Code
+- Use TypeScript for type safety
+- Implement proper error handling and logging
+- Write unit tests for new components and functions
+- Use React hooks for state management and side effects
+- Optimize performance using React's built-in features (e.g., useMemo, useCallback)
+- Follow the Next.js App Router conventions for routing and API routes
+
+### Extending Functionality
+
+To add new features:
+
+1. Plan the feature and how it fits into the existing architecture
+2. Create new components or modify existing ones as needed
+3. Update the database schema if required
+4. Implement any necessary API routes
+5. Add the feature to the main user interface (usually in the `HomePage` component)
+6. Update this README with information about the new feature
 
 ## Contributing
 

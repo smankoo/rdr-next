@@ -98,18 +98,10 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, theme }) 
     }
   };
 
-  const getFirstSentence = (text: string): string => {
-    // Remove all HTML tags, entities, and excessive whitespace
-    const cleanText = text
-      .replace(/<[^>]*>/g, "") // Remove HTML tags
-      .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
-      .replace(/&[a-z]+;/g, "") // Remove other HTML entities
-      .replace(/\s+/g, " ") // Replace multiple spaces with single space
-      .trim();
-
-    // Extract the first sentence
-    const match = cleanText.match(/^.*?[.!?](?:\s|$)/);
-    return match ? match[0].trim() : cleanText;
+  const getFirstSentence = (text: string | null): string => {
+    if (!text) return "";
+    const match = text.match(/^.*?[.!?](?:\s|$)/);
+    return match ? match[0].trim() : text;
   };
 
   const getNumberOfSentences = (text: string): number => {

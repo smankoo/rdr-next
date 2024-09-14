@@ -104,12 +104,6 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, theme }) 
     return match ? match[0].trim() : text;
   };
 
-  const getNumberOfSentences = (text: string): number => {
-    const cleanText = text.replace(/<[^>]*>/g, ""); // Remove HTML tags
-    const sentences = cleanText.match(/[^.!?]+[.!?]+/g);
-    return sentences ? sentences.length : 0;
-  };
-
   const sanitizeAndFormatContent = (content: string | null, isFirstParagraph: boolean) => {
     if (!content) return ""; // Handle null content
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Settings, ChevronRight, ChevronDown, Sun, Moon } from "lucide-react";
+import { Plus, Settings, ChevronRight, ChevronDown } from "lucide-react";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/app/components/ui/collapsible";
@@ -8,7 +8,6 @@ import { Feed } from "@/app/types";
 import { useResizable } from "../hooks/useResizable";
 import { AddFeedModal } from "./AddFeedModal";
 import { FeedSettingsModal } from "./FeedSettingsModal";
-import { useTheme } from "../contexts/ThemeContext";
 import useLocalStorage from "../hooks/useLocalStorage";
 
 // Add these new SVG components
@@ -53,10 +52,6 @@ export function Sidebar({
   setSelectedFeedId,
   deleteFeed,
   addFeed,
-  newFeedUrl,
-  setNewFeedUrl,
-  newFeedName,
-  setNewFeedName,
   isAddFeedOpen,
   setIsAddFeedOpen,
   updateFeed,
@@ -83,20 +78,14 @@ export function Sidebar({
         setWidth(parsedWidth);
       }
     }
-  }, []);
+  }, [setWidth, minWidth, maxWidth]); // Add dependencies here
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingFeed, setEditingFeed] = useState<Feed | null>(null);
-  const [editingFeedUrl, setEditingFeedUrl] = useState("");
-  const [editingFeedName, setEditingFeedName] = useState("");
   const [isAllFeedsOpen, setIsAllFeedsOpen] = useState(true);
-  const [isResizing, setIsResizing] = useState(false);
-  const { theme: contextTheme, setTheme: contextSetTheme } = useTheme();
 
   const handleOpenSettings = (feed: Feed) => {
     setEditingFeed(feed);
-    setEditingFeedUrl(feed.url);
-    setEditingFeedName(feed.name);
     setIsSettingsOpen(true);
   };
 

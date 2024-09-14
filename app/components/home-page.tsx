@@ -8,7 +8,6 @@ import { Feed, Article } from "@/app/types";
 import { fetchArticles, fetchFeeds, addFeed, deleteFeed, updateFeed } from "@/app/lib/feedUtils";
 import { useUserPreferences } from "../hooks/useUserPreferences";
 import dynamic from "next/dynamic";
-import ArticleModal from "@/app/components/ArticleModal";
 import SettingsModal from "@/app/components/SettingsModal";
 import { UserPreferences } from "@/app/types";
 
@@ -46,11 +45,6 @@ export function HomePage() {
     initializePage();
   }, [loadArticles]);
 
-  const initializePage = async () => {
-    await loadFeeds();
-    // Remove loadArticles from here, as it will be called by the effect above
-  };
-
   const loadFeeds = async () => {
     try {
       const fetchedFeeds = await fetchFeeds();
@@ -60,41 +54,47 @@ export function HomePage() {
     }
   };
 
-  const handleAddFeed = async (url: string, name: string) => {
-    try {
-      const newFeed = await addFeed(url, name);
-      setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
-      updatePreference("selectedFeedId", newFeed.id);
-      setNewFeedUrl("");
-      setNewFeedName("");
-      setIsAddFeedOpen(false);
-      await loadArticles();
-    } catch (error) {
-      console.error("Error adding feed:", error);
-    }
-  };
-
-  const handleDeleteFeed = async (feedId: string) => {
-    try {
-      await deleteFeed(feedId);
-      setFeeds((prevFeeds) => prevFeeds.filter((feed) => feed.id !== feedId));
-      if (feeds.length === 1) {
-        setArticles([]);
-        updatePreference("selectedFeedId", null);
+  const handleAddFeed = useCallback(
+    async (url: string, name: string) => {
+      try {
+        const newFeed = await addFeed(url, name);
+        setFeeds((prevFeeds) => [...prevFeeds, newFeed]);
+        updatePreference("selectedFeedId", newFeed.id);
+        setNewFeedUrl("");
+        setNewFeedName("");
+        setIsAddFeedOpen(false);
+        await loadArticles();
+      } catch (error) {
+        console.error("Error adding feed:", error);
       }
-    } catch (error) {
-      console.error("Error deleting feed:", error);
-    }
-  };
+    },
+    [updatePreference, loadArticles]
+  );
 
-  const handleUpdateFeed = async (id: string, url: string, name: string) => {
+  const handleDeleteFeed = useCallback(
+    async (feedId: string) => {
+      try {
+        await deleteFeed(feedId);
+        setFeeds((prevFeeds) => prevFeeds.filter((feed) => feed.id !== feedId));
+        if (feeds.length === 1) {
+          setArticles([]);
+          updatePreference("selectedFeedId", null);
+        }
+      } catch (error) {
+        console.error("Error deleting feed:", error);
+      }
+    },
+    [feeds.length, updatePreference]
+  );
+
+  const handleUpdateFeed = useCallback(async (id: string, url: string, name: string) => {
     try {
       await updateFeed(id, url, name);
       setFeeds((prevFeeds) => prevFeeds.map((feed) => (feed.id === id ? { ...feed, url, name } : feed)));
     } catch (error) {
       console.error("Error updating feed:", error);
     }
-  };
+  }, []);
 
   const handleMarkArticleAsRead = async (articleId: string, isRead: boolean = true) => {
     try {
@@ -169,7 +169,18 @@ export function HomePage() {
       theme: preferences.theme,
       setTheme: (theme: "modern" | "newspaper") => updatePreference("theme", theme),
     }),
-    [feeds, preferences.selectedFeedId, newFeedUrl, newFeedName, isAddFeedOpen, preferences.theme, updatePreference]
+    [
+      feeds,
+      preferences.selectedFeedId,
+      newFeedUrl,
+      newFeedName,
+      isAddFeedOpen,
+      preferences.theme,
+      updatePreference,
+      handleDeleteFeed,
+      handleAddFeed,
+      handleUpdateFeed,
+    ]
   );
 
   const handleOpenSettings = () => {
@@ -197,7 +208,6 @@ export function HomePage() {
           handleRefreshFeeds={handleRefreshFeeds}
           displayMode={preferences.displayMode}
           toggleDisplayMode={toggleDisplayMode}
-          handleSetActiveFilter={handleSetActiveFilter}
           activeFilter={preferences.activeFilter}
           setDisplayMode={(mode: "list" | "grid") => updatePreference("displayMode", mode)}
           filterButtons={
@@ -210,7 +220,6 @@ export function HomePage() {
           isLoading={isLoading}
           feeds={feeds}
           markArticleAsRead={handleMarkArticleAsRead}
-          fetchAllArticles={loadArticles}
           displayMode={preferences.displayMode}
           theme={preferences.theme} // Add this line
         />

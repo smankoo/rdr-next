@@ -9,7 +9,6 @@ interface ArticleListProps {
   isLoading: boolean;
   feeds: Feed[];
   markArticleAsRead: (articleId: string, isRead?: boolean) => void;
-  fetchAllArticles: () => void;
   displayMode: "list" | "grid";
   theme: "modern" | "newspaper"; // Add this line
 }
@@ -21,7 +20,6 @@ const ArticleList: React.FC<ArticleListProps> = ({
   isLoading,
   feeds,
   markArticleAsRead,
-  fetchAllArticles,
   displayMode,
   theme,
 }) => {

@@ -19,9 +19,6 @@ interface HeaderProps {
   handleRefreshFeeds: () => Promise<void>;
   displayMode: "list" | "grid";
   toggleDisplayMode: () => void;
-  handleSetActiveFilter: (filter: "All Articles" | "Unread") => void;
-  activeFilter: "All Articles" | "Unread";
-  setDisplayMode: (mode: "list" | "grid") => void;
   onOpenSettings: () => void;
 }
 
@@ -32,9 +29,6 @@ export function Header({
   handleRefreshFeeds,
   displayMode,
   toggleDisplayMode,
-  handleSetActiveFilter,
-  activeFilter,
-  setDisplayMode,
   onOpenSettings,
 }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);

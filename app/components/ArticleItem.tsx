@@ -39,7 +39,14 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
       )}
       {article.imageUrl && (
         <div className={`${displayMode === "grid" ? "w-full h-48" : "w-1/4 h-auto"}`}>
-          <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+          <Image
+            src={article.imageUrl}
+            alt={article.title}
+            className="w-full h-full object-cover"
+            width={500}
+            height={300}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
         </div>
       )}
       <div className={`${displayMode === "grid" ? "p-4" : "flex-1 p-4"}`}>

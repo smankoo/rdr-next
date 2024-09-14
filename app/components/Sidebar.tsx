@@ -42,6 +42,8 @@ interface SidebarProps {
   isAddFeedOpen: boolean;
   setIsAddFeedOpen: (isOpen: boolean) => void;
   updateFeed: (id: string, url: string, name: string) => Promise<void>;
+  theme: "modern" | "newspaper" | null;
+  setTheme: (theme: "modern" | "newspaper") => void;
 }
 
 export function Sidebar({
@@ -57,6 +59,8 @@ export function Sidebar({
   isAddFeedOpen,
   setIsAddFeedOpen,
   updateFeed,
+  theme,
+  setTheme,
 }: SidebarProps) {
   const { width, handleResize } = useResizable(250, 200, 400);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -65,7 +69,7 @@ export function Sidebar({
   const [editingFeedName, setEditingFeedName] = useState("");
   const [isAllFeedsOpen, setIsAllFeedsOpen] = useState(true);
   const [isResizing, setIsResizing] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme: contextTheme, setTheme: contextSetTheme } = useTheme();
 
   const handleOpenSettings = (feed: Feed) => {
     setEditingFeed(feed);
@@ -164,12 +168,14 @@ export function Sidebar({
       </ScrollArea>
 
       {/* Theme selector with new icons */}
-      <div className="mt-4 mb-4">
-        <Button onClick={toggleTheme} variant="outline" className="w-full justify-between">
-          <span>{theme === "modern" ? "Modern" : "Newspaper"}</span>
-          {theme === "modern" ? <ModernThemeIcon /> : <NewspaperThemeIcon />}
-        </Button>
-      </div>
+      {theme !== null && (
+        <div className="mt-4 mb-4">
+          <Button onClick={toggleTheme} variant="outline" className="w-full justify-between">
+            <span>{theme === "modern" ? "Modern" : "Newspaper"}</span>
+            {theme === "modern" ? <ModernThemeIcon /> : <NewspaperThemeIcon />}
+          </Button>
+        </div>
+      )}
 
       <Dialog open={isAddFeedOpen} onOpenChange={setIsAddFeedOpen}>
         <DialogTrigger asChild>

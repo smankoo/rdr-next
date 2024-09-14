@@ -10,6 +10,7 @@ import { useUserPreferences } from "../hooks/useUserPreferences";
 import dynamic from "next/dynamic";
 import ArticleModal from "@/app/components/ArticleModal";
 import SettingsModal from "@/app/components/SettingsModal";
+import { UserPreferences } from "@/app/types";
 
 const FilterButtons = dynamic(() => import("@/app/components/FilterButtons").then((mod) => mod.FilterButtons), {
   ssr: false,

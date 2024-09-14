@@ -17,3 +17,11 @@ export interface Article {
   isRead: boolean;
   feedId: string;
 }
+
+export interface UserPreferences {
+  // Add the properties of UserPreferences here
+  theme: "modern" | "newspaper";
+  displayMode: "list" | "grid";
+  selectedFeedId: string | null;
+  activeFilter: "All Articles" | "Unread";
+}

@@ -67,25 +67,6 @@ export function Sidebar({
   const [isResizing, setIsResizing] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  useEffect(() => {
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      document.body.classList.remove("resizing");
-    };
-
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, []);
-
-  const handleStartResizing = (e: React.MouseEvent) => {
-    setIsResizing(true);
-    document.body.classList.add("resizing");
-    startResizing(e);
-  };
-
   const handleOpenSettings = (feed: Feed) => {
     setEditingFeed(feed);
     setEditingFeedUrl(feed.url);
@@ -125,7 +106,7 @@ export function Sidebar({
     <aside className="p-4 hidden md:block relative select-none" style={{ width: `${width}px` }}>
       <div
         className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-300"
-        onMouseDown={handleStartResizing}
+        onMouseDown={startResizing}
       />
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
       <ScrollArea className="h-[calc(100vh-16rem)]">

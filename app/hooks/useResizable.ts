@@ -1,37 +1,35 @@
 import { useState, useCallback, useEffect } from "react";
 
 export function useResizable(initialWidth: number, minWidth: number, maxWidth: number) {
-  const [width, setWidth] = useState(initialWidth);
-  const [isResizing, setIsResizing] = useState(false);
-
-  const startResizing = useCallback(() => {
-    setIsResizing(true);
-  }, []);
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  const resize = useCallback(
-    (mouseMoveEvent: MouseEvent) => {
-      if (isResizing) {
-        const newWidth = mouseMoveEvent.clientX;
-        if (newWidth >= minWidth && newWidth <= maxWidth) {
-          setWidth(newWidth);
-        }
-      }
-    },
-    [isResizing, minWidth, maxWidth]
-  );
+  const [width, setWidth] = useState(() => {
+    const savedWidth = localStorage.getItem("sidebarWidth");
+    return savedWidth ? Math.max(minWidth, Math.min(parseInt(savedWidth, 10), maxWidth)) : initialWidth;
+  });
 
   useEffect(() => {
-    window.addEventListener("mousemove", resize);
-    window.addEventListener("mouseup", stopResizing);
-    return () => {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", stopResizing);
-    };
-  }, [resize, stopResizing]);
+    localStorage.setItem("sidebarWidth", width.toString());
+  }, [width]);
 
-  return { width, startResizing };
+  const startResizing = useCallback(
+    (mouseDownEvent: React.MouseEvent) => {
+      const startX = mouseDownEvent.clientX;
+      const startWidth = width;
+
+      const doDrag = (mouseMoveEvent: MouseEvent) => {
+        const newWidth = startWidth + mouseMoveEvent.clientX - startX;
+        setWidth(Math.max(minWidth, Math.min(newWidth, maxWidth)));
+      };
+
+      const stopDrag = () => {
+        document.removeEventListener("mousemove", doDrag);
+        document.removeEventListener("mouseup", stopDrag);
+      };
+
+      document.addEventListener("mousemove", doDrag);
+      document.addEventListener("mouseup", stopDrag);
+    },
+    [width, minWidth, maxWidth]
+  );
+
+  return { width, startResizing, setWidth };
 }

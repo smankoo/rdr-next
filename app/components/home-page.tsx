@@ -208,8 +208,6 @@ export function HomePage() {
           handleRefreshFeeds={handleRefreshFeeds}
           displayMode={preferences.displayMode}
           toggleDisplayMode={toggleDisplayMode}
-          activeFilter={preferences.activeFilter}
-          setDisplayMode={(mode: "list" | "grid") => updatePreference("displayMode", mode)}
           filterButtons={
             <FilterButtons activeFilter={preferences.activeFilter} handleSetActiveFilter={handleSetActiveFilter} />
           }

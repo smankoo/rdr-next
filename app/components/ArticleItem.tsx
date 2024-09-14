@@ -8,9 +8,10 @@ interface ArticleItemProps {
   article: Article;
   feedName: string;
   onTitleClick: () => void;
+  displayMode: "list" | "grid";
 }
 
-export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProps) {
+export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onTitleClick, displayMode }) => {
   const readingTime = calculateReadingTime(article.description ?? "");
   const decodedDescription = decodeHTMLEntities(article.description ?? "");
 
@@ -21,21 +22,14 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
 
   return (
     <div
-      className="flex space-x-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-default"
-      onClick={onTitleClick}
+      className={`bg-white rounded-lg shadow-md overflow-hidden ${displayMode === "grid" ? "flex flex-col" : "flex"}`}
     >
       {article.imageUrl && (
-        <div className="article-image-container w-48 h-48 flex-shrink-0 overflow-hidden rounded-lg">
-          <Image
-            src={article.imageUrl}
-            alt={article.title}
-            width={192}
-            height={192}
-            className="article-image w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-          />
+        <div className={`${displayMode === "grid" ? "w-full h-48" : "w-1/4 h-auto"}`}>
+          <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
         </div>
       )}
-      <div className="flex-1 flex flex-col">
+      <div className={`${displayMode === "grid" ? "p-4" : "flex-1 p-4"}`}>
         <h2
           className="text-xl font-bold text-gray-800 mb-3 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
           // onClick={onTitleClick}
@@ -93,6 +87,6 @@ export function ArticleItem({ article, feedName, onTitleClick }: ArticleItemProp
       </div>
     </div>
   );
-}
+};
 
 // Remove the ArticleItemStyles export

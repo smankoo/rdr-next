@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Settings, RefreshCw } from "lucide-react";
+import { Search, Settings, RefreshCw, List, Grid } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { getPlaceholderImage } from "@/app/lib/imageUtils";
@@ -10,9 +10,18 @@ interface HeaderProps {
   filterButtons: React.ReactNode;
   lastRefreshed: Date | null;
   handleRefreshFeeds: () => Promise<void>;
+  displayMode: "list" | "grid";
+  toggleDisplayMode: () => void;
 }
 
-export function Header({ feedName, filterButtons, lastRefreshed, handleRefreshFeeds }: HeaderProps) {
+export function Header({
+  feedName,
+  filterButtons,
+  lastRefreshed,
+  handleRefreshFeeds,
+  displayMode,
+  toggleDisplayMode,
+}: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -38,6 +47,24 @@ export function Header({ feedName, filterButtons, lastRefreshed, handleRefreshFe
         {filterButtons}
       </div>
       <div className="flex items-center space-x-4">
+        <Button
+          onClick={toggleDisplayMode}
+          variant="ghost"
+          size="sm"
+          className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
+        >
+          {displayMode === "list" ? (
+            <>
+              <Grid className="h-4 w-4 mr-2" />
+              <span>Grid</span>
+            </>
+          ) : (
+            <>
+              <List className="h-4 w-4 mr-2" />
+              <span>List</span>
+            </>
+          )}
+        </Button>
         <Button
           onClick={handleRefresh}
           variant="ghost"

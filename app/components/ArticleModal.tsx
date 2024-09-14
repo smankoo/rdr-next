@@ -134,34 +134,16 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(sanitizedContent, "text/html");
 
-    // // Remove unwanted elements
-    // const unwantedTexts = [
-    //   "Advertisement",
-    //   "SKIP ADVERTISEMENT",
-    //   "liveUpdates",
-    //   "Poll Tracker",
-    //   "Who Won the Debate?",
-    //   "Takeaways",
-    //   "Undecided Voters React",
-    //   "Key Issues",
-    // ];
+    // // if doc contains images, list them
+    // if (doc.querySelectorAll("img").length > 0) {
+    //   console.log("Images found in the article:");
+    //   doc.querySelectorAll("img").forEach((img, index) => {
+    //     console.log(`Image ${index + 1}: ${img.src}`);
+    //   });
+    // }
 
-    // doc.body.querySelectorAll("*").forEach((el) => {
-    //   const textContent = el.textContent;
-    //   if (textContent && unwantedTexts.some((text) => textContent.includes(text))) {
-    //     el.remove();
-    //   }
-    // });
-
-    // // Remove elements with class 'live-blog-post'
-    // doc.querySelectorAll(".live-blog-post").forEach((el) => el.remove());
-
-    // // Remove empty paragraphs
-    // doc.querySelectorAll("p").forEach((p) => {
-    //   if (p.textContent?.trim() === "") {
-    //     p.remove();
-    //   }
-    // });
+    // list heirarchy of elements
+    // console.log(doc.body.innerHTML);
 
     // Add classes to paragraphs for better spacing and animation
     doc.querySelectorAll("p").forEach((p, index) => {
@@ -218,9 +200,9 @@ const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
     });
 
     // Style images
-    // doc.querySelectorAll("img").forEach((img) => {
-    //   img.classList.add("rounded-lg", "shadow-md", "my-4");
-    // });
+    doc.querySelectorAll("img").forEach((img) => {
+      img.classList.add("rounded-lg", "shadow-md", "my-4");
+    });
 
     // Style lists
     doc.querySelectorAll("ul, ol").forEach((list) => {

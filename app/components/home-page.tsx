@@ -21,6 +21,7 @@ export function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(0);
+  const [displayMode, setDisplayMode] = useState<"list" | "grid">("list");
 
   useEffect(() => {
     fetchFeeds();
@@ -201,6 +202,10 @@ export function HomePage() {
 
   const themeClasses = theme === "newspaper" ? "font-serif" : "font-sans";
 
+  const toggleDisplayMode = () => {
+    setDisplayMode((prevMode) => (prevMode === "list" ? "grid" : "list"));
+  };
+
   return (
     <div className={`flex h-screen ${themeClasses}`}>
       <Sidebar
@@ -223,6 +228,8 @@ export function HomePage() {
           filterButtons={filterButtons}
           lastRefreshed={lastRefreshed}
           handleRefreshFeeds={handleRefreshFeeds}
+          displayMode={displayMode}
+          toggleDisplayMode={toggleDisplayMode}
         />
         <ArticleList
           articles={filteredArticles()}
@@ -230,6 +237,7 @@ export function HomePage() {
           feeds={feeds}
           markArticleAsRead={markArticleAsRead}
           fetchAllArticles={fetchAllArticles}
+          displayMode={displayMode}
         />
       </main>
     </div>

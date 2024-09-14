@@ -40,6 +40,13 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, m
     return feed ? feed.name : "Unknown Feed";
   };
 
+  const handleArticleClick = (article: Article) => {
+    setSelectedArticle(article);
+    if (!article.isRead) {
+      markArticleAsRead(article.id, true);
+    }
+  };
+
   return (
     <div className="h-full overflow-hidden flex flex-col">
       <div className="flex-grow overflow-y-auto">
@@ -50,14 +57,11 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, isLoading, feeds, m
             }`}
           >
             {displayedArticles.map((article) => (
-              <div key={article.id} onClick={() => setSelectedArticle(article)}>
+              <div key={article.id} onClick={() => handleArticleClick(article)}>
                 <ArticleItem
                   article={article}
                   feedName={getFeedName(article.feedId)}
-                  onTitleClick={() => {
-                    setSelectedArticle(article);
-                    markArticleAsRead(article.id);
-                  }}
+                  onTitleClick={() => handleArticleClick(article)}
                   displayMode={displayMode}
                 />
               </div>

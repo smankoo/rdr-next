@@ -22,7 +22,13 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-md overflow-hidden ${displayMode === "grid" ? "flex flex-col" : "flex"}`}
+      className={`
+        bg-white rounded-lg shadow-md overflow-hidden
+        transition-all duration-300 ease-in-out
+        hover:shadow-lg hover:scale-[1.02]
+        ${displayMode === "grid" ? "flex flex-col" : "flex"}
+        ${article.isRead ? "opacity-75" : ""}
+      `}
     >
       {article.imageUrl && (
         <div className={`${displayMode === "grid" ? "w-full h-48" : "w-1/4 h-auto"}`}>
@@ -31,8 +37,9 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
       )}
       <div className={`${displayMode === "grid" ? "p-4" : "flex-1 p-4"}`}>
         <h2
-          className="text-xl font-bold text-gray-800 mb-3 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
-          // onClick={onTitleClick}
+          className={`text-xl font-bold mb-3 cursor-pointer transition-colors duration-200
+            ${article.isRead ? "text-gray-500" : "text-gray-800 hover:text-indigo-600"}`}
+          onClick={onTitleClick}
         >
           {article.title}
         </h2>
@@ -44,15 +51,9 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ article, feedName, onT
           <span>{readingTime}</span>
           <span className="mx-2 text-gray-300">•</span>
           {article.isRead ? (
-            <>
-              <span className="w-2 h-2 bg-gray-400 rounded-full mr-1 inline-block"></span>
-              {/* <span>Read</span> */}
-            </>
+            <span className="w-2 h-2 bg-gray-400 rounded-full mr-1 inline-block"></span>
           ) : (
-            <>
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-1 inline-block"></span>
-              {/* <span>Unread</span> */}
-            </>
+            <span className="w-2 h-2 bg-green-500 rounded-full mr-1 inline-block"></span>
           )}
         </p>
         <div

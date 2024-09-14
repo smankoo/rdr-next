@@ -3,7 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { fetchFeed } from "@/app/lib/rssFetcher";
 import { addArticlesToDatabase } from "@/app/lib/feedUtils";
 
-export async function POST() {
+export async function GET() {
   try {
     // Fetch all feeds from the database
     const feeds = await prisma.feed.findMany();

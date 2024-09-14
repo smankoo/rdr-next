@@ -20,6 +20,7 @@ export function HomePage() {
   const [isAddFeedOpen, setIsAddFeedOpen] = useState(false);
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(0);
 
   useEffect(() => {
     fetchFeeds();
@@ -185,11 +186,16 @@ export function HomePage() {
     }
   };
 
-  const refreshArticles = async () => {
-    if (selectedFeedId) {
-      await fetchArticlesForFeed(selectedFeedId);
-    } else {
-      await fetchAllArticles();
+  const handleRefreshFeeds = async () => {
+    try {
+      const response = await fetch("/api/feeds/refresh");
+      if (response.ok) {
+        console.log("Feeds refreshed successfully");
+      } else {
+        console.error("Failed to refresh feeds");
+      }
+    } catch (error) {
+      console.error("Error refreshing feeds:", error);
     }
   };
 
@@ -216,7 +222,7 @@ export function HomePage() {
           feedName={currentFeedName}
           filterButtons={filterButtons}
           lastRefreshed={lastRefreshed}
-          refreshArticles={refreshArticles}
+          handleRefreshFeeds={handleRefreshFeeds}
         />
         <ArticleList
           articles={filteredArticles()}

@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         // If no articles, fetch them
         const fetchedArticles = await fetchFeed(feed.url);
         await prisma.article.createMany({
-          data: fetchedArticles.map((article) => ({
+          data: fetchedArticles.items.map((article) => ({
             ...article,
             feedId: feed.id,
           })),

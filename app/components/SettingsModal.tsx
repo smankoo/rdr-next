@@ -14,7 +14,14 @@ interface SettingsModalProps {
   setDisplayMode: (mode: "list" | "grid") => void;
 }
 
-export function SettingsModal({ isOpen, onClose, theme, setTheme, displayMode, setDisplayMode }: SettingsModalProps) {
+export default function SettingsModal({
+  isOpen,
+  onClose,
+  theme,
+  setTheme,
+  displayMode,
+  setDisplayMode,
+}: SettingsModalProps) {
   return (
     <BaseModal
       isOpen={isOpen}

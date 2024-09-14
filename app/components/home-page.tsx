@@ -9,6 +9,7 @@ import { fetchArticles, fetchFeeds, addFeed, deleteFeed, updateFeed } from "@/ap
 import { useUserPreferences } from "../hooks/useUserPreferences";
 import dynamic from "next/dynamic";
 import ArticleModal from "@/app/components/ArticleModal";
+import SettingsModal from "@/app/components/SettingsModal";
 
 const FilterButtons = dynamic(() => import("@/app/components/FilterButtons").then((mod) => mod.FilterButtons), {
   ssr: false,
@@ -22,6 +23,7 @@ export function HomePage() {
   const [newFeedUrl, setNewFeedUrl] = useState("");
   const [newFeedName, setNewFeedName] = useState("");
   const [isAddFeedOpen, setIsAddFeedOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const loadArticles = useCallback(async () => {
     setIsLoading(true);
@@ -169,6 +171,21 @@ export function HomePage() {
     [feeds, preferences.selectedFeedId, newFeedUrl, newFeedName, isAddFeedOpen, preferences.theme, updatePreference]
   );
 
+  const handleOpenSettings = () => {
+    setIsSettingsOpen(true);
+  };
+
+  const handleCloseSettings = () => {
+    setIsSettingsOpen(false);
+  };
+
+  const handleUpdatePreference = useCallback(
+    (key: keyof UserPreferences, value: any) => {
+      updatePreference(key, value);
+    },
+    [updatePreference]
+  );
+
   return (
     <div className={`flex h-screen ${preferences.theme === "newspaper" ? "font-serif" : "font-sans"}`}>
       <Sidebar {...sidebarProps} />
@@ -185,6 +202,7 @@ export function HomePage() {
           filterButtons={
             <FilterButtons activeFilter={preferences.activeFilter} handleSetActiveFilter={handleSetActiveFilter} />
           }
+          onOpenSettings={handleOpenSettings}
         />
         <ArticleList
           articles={filteredArticles}
@@ -196,6 +214,14 @@ export function HomePage() {
           theme={preferences.theme} // Add this line
         />
       </main>
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={handleCloseSettings}
+        theme={preferences.theme}
+        setTheme={(theme) => handleUpdatePreference("theme", theme)}
+        displayMode={preferences.displayMode}
+        setDisplayMode={(mode) => handleUpdatePreference("displayMode", mode)}
+      />
     </div>
   );
 }

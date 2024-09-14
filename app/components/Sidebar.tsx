@@ -9,6 +9,7 @@ import { useResizable } from "../hooks/useResizable";
 import { AddFeedModal } from "./AddFeedModal";
 import { FeedSettingsModal } from "./FeedSettingsModal";
 import { useTheme } from "../contexts/ThemeContext";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 // Add these new SVG components
 const ModernThemeIcon = () => (
@@ -67,25 +68,22 @@ export function Sidebar({
   const maxWidth = 400;
 
   // Use state to manage the width
-  const [width, setWidth] = useState(() => {
-    // Initialize width from localStorage or use default
-    const savedWidth = localStorage.getItem("sidebarWidth");
-    if (savedWidth) {
-      const parsedWidth = parseInt(savedWidth, 10);
-      if (!isNaN(parsedWidth) && parsedWidth >= minWidth && parsedWidth <= maxWidth) {
-        return parsedWidth;
-      }
-    }
-    return defaultWidth;
-  });
+  const [width, setWidth] = useLocalStorage("sidebarWidth", defaultWidth); // Default width
 
   // Use the useResizable hook
   const { handleResize } = useResizable(width, minWidth, maxWidth);
 
   // Save the width to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("sidebarWidth", width.toString());
-  }, [width]);
+    // Access localStorage only on the client side
+    const savedWidth = localStorage.getItem("sidebarWidth");
+    if (savedWidth) {
+      const parsedWidth = parseInt(savedWidth, 10);
+      if (!isNaN(parsedWidth) && parsedWidth >= minWidth && parsedWidth <= maxWidth) {
+        setWidth(parsedWidth);
+      }
+    }
+  }, []);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingFeed, setEditingFeed] = useState<Feed | null>(null);

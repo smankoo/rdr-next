@@ -22,6 +22,7 @@ interface HeaderProps {
   handleSetActiveFilter: (filter: "All Articles" | "Unread") => void;
   activeFilter: "All Articles" | "Unread";
   setDisplayMode: (mode: "list" | "grid") => void;
+  onOpenSettings: () => void;
 }
 
 export function Header({
@@ -34,6 +35,7 @@ export function Header({
   handleSetActiveFilter,
   activeFilter,
   setDisplayMode,
+  onOpenSettings,
 }: HeaderProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -92,7 +94,12 @@ export function Header({
           <DynamicSearch className="h-4 w-4 mr-2" />
           <span>Search</span>
         </Button>
-        <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100">
+        <Button
+          onClick={onOpenSettings}
+          variant="ghost"
+          size="sm"
+          className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100"
+        >
           <DynamicSettings className="h-4 w-4 mr-2" />
           <span>Settings</span>
         </Button>

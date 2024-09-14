@@ -5,7 +5,7 @@ import { Button } from "@/app/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/app/components/ui/collapsible";
 import { Dialog, DialogTrigger } from "@/app/components/ui/dialog";
 import { Feed } from "@/app/types";
-import { useResizable } from "@/app/hooks/useResizable";
+import { useResizable } from "../hooks/useResizable";
 import { AddFeedModal } from "./AddFeedModal";
 import { FeedSettingsModal } from "./FeedSettingsModal";
 import { useTheme } from "../contexts/ThemeContext";
@@ -58,7 +58,7 @@ export function Sidebar({
   setIsAddFeedOpen,
   updateFeed,
 }: SidebarProps) {
-  const { width, startResizing } = useResizable(256, 200, 400);
+  const { width, handleResize } = useResizable(250, 200, 400);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [editingFeed, setEditingFeed] = useState<Feed | null>(null);
   const [editingFeedUrl, setEditingFeedUrl] = useState("");
@@ -106,7 +106,7 @@ export function Sidebar({
     <aside className="p-4 hidden md:block relative select-none" style={{ width: `${width}px` }}>
       <div
         className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-300"
-        onMouseDown={startResizing}
+        onMouseDown={handleResize}
       />
       <h2 className="text-lg font-semibold mb-4">Feeds</h2>
       <ScrollArea className="h-[calc(100vh-16rem)]">

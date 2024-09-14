@@ -12,9 +12,7 @@ import { useTheme } from "../contexts/ThemeContext";
 export function HomePage() {
   const { theme } = useTheme();
 
-  const [activeFilter, setActiveFilter] = useState<"All Articles" | "Unread">(() => {
-    return (localStorage.getItem("activeFilter") as "All Articles" | "Unread") || "All Articles";
-  });
+  const [activeFilter, setActiveFilter] = useState<"All Articles" | "Unread">("All Articles");
   const [feeds, setFeeds] = useState<Feed[]>([]);
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [newFeedUrl, setNewFeedUrl] = useState("");
@@ -23,13 +21,15 @@ export function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(0);
-  const [displayMode, setDisplayMode] = useState<"list" | "grid">(() => {
-    return (localStorage.getItem("displayMode") as "list" | "grid") || "list";
-  });
+  const [displayMode, setDisplayMode] = useState<"list" | "grid">("list");
 
   useEffect(() => {
-    fetchFeeds();
-    fetchAllArticles();
+    // Load saved preferences from localStorage
+    const savedFilter = localStorage.getItem("activeFilter") as "All Articles" | "Unread";
+    const savedDisplayMode = localStorage.getItem("displayMode") as "list" | "grid";
+
+    if (savedFilter) setActiveFilter(savedFilter);
+    if (savedDisplayMode) setDisplayMode(savedDisplayMode);
   }, []);
 
   useEffect(() => {

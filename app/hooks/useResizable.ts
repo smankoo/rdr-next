@@ -1,35 +1,20 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export function useResizable(initialWidth: number, minWidth: number, maxWidth: number) {
-  const [width, setWidth] = useState(() => {
-    const savedWidth = localStorage.getItem("sidebarWidth");
-    return savedWidth ? Math.max(minWidth, Math.min(parseInt(savedWidth, 10), maxWidth)) : initialWidth;
-  });
+  const [width, setWidth] = useState(initialWidth);
 
   useEffect(() => {
-    localStorage.setItem("sidebarWidth", width.toString());
-  }, [width]);
+    const savedWidth = localStorage.getItem("sidebarWidth");
+    if (savedWidth) {
+      setWidth(Math.max(minWidth, Math.min(parseInt(savedWidth, 10), maxWidth)));
+    }
+  }, [minWidth, maxWidth]);
 
-  const startResizing = useCallback(
-    (mouseDownEvent: React.MouseEvent) => {
-      const startX = mouseDownEvent.clientX;
-      const startWidth = width;
+  const handleResize = (newWidth: number) => {
+    const clampedWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+    setWidth(clampedWidth);
+    localStorage.setItem("sidebarWidth", clampedWidth.toString());
+  };
 
-      const doDrag = (mouseMoveEvent: MouseEvent) => {
-        const newWidth = startWidth + mouseMoveEvent.clientX - startX;
-        setWidth(Math.max(minWidth, Math.min(newWidth, maxWidth)));
-      };
-
-      const stopDrag = () => {
-        document.removeEventListener("mousemove", doDrag);
-        document.removeEventListener("mouseup", stopDrag);
-      };
-
-      document.addEventListener("mousemove", doDrag);
-      document.addEventListener("mouseup", stopDrag);
-    },
-    [width, minWidth, maxWidth]
-  );
-
-  return { width, startResizing, setWidth };
+  return { width, handleResize };
 }

@@ -48,6 +48,7 @@
     "react-intersection-observer": "^9.13.1",
     "react-resizable-layout": "^0.7.2",
     "rss-parser": "^3.13.0",
+    "sharp": "^0.33.5",
     "stream-browserify": "^3.0.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",

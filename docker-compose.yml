@@ -1,11 +1,10 @@
-version: "3.8"
-
 services:
   app:
-    build: .
+    image: rdr-next-app
     ports:
       - "3000:3000"
     environment:
+      - DATABASE_URL="file:/data/db.sqlite" # User's data volume
       - NODE_ENV=production
     volumes:
-      - .:/app
+      - ./data:/data # Mount the user's storage location

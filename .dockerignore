@@ -8,3 +8,6 @@ README.md
 .next
 .swc
 .dockerignore
+.data
+data
+.env

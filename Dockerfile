@@ -1,4 +1,4 @@
-FROM  node:22 AS base
+FROM node:22 AS base
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -21,15 +21,17 @@ RUN npm rebuild canvas
 # Copy the rest of the application code
 COPY . .
 
+# Generate Prisma client
 RUN bunx prisma generate
-# Run tests to ensure everything works
+
+# Run tests
 RUN bun run test
 
-# Build the application
+# Build the Next.js app
 RUN bun run build
 
 # Expose the port Next.js will run on
 EXPOSE 3000
 
-# Start the Next.js app
-CMD ["bun", "run", "start"]
+# Command to run migrations before starting the app
+CMD ["sh", "-c", "bunx prisma migrate deploy || true && bun run start"]
